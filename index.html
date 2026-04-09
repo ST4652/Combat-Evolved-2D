@@ -1,14 +1,97 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Combat Evolved 2D</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            
+            background-image: url(halo\ ring\ pixelovane\ menu\ 3.png); 
+            
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #000; /* Záložná farba */
+            
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            
+            font-family: 'Press Start 2P', system-ui, sans-serif;
+        }
+
+        
+        .menu-container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        
+        .game-title {
+            color: #fff;
+            font-size: 3rem;
+            margin-bottom: 60px;
+            text-transform: uppercase;
+            text-shadow: 4px 4px 0px #000; 
+        }
+
+        .menu-options {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            align-items: center;
+        }
+
+        
+        .menu-btn {
+            background: transparent;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            font-size: 1.2rem;
+            font-family: 'Press Start 2P', system-ui, sans-serif;
+            cursor: pointer;
+            text-transform: uppercase;
+            text-shadow: 3px 3px 0px #000; 
+            transition: transform 0.2s ease; 
+        }
+
+        
+        .menu-btn:hover {
+            transform: scale(1.15);
+        }
+
+        
+        .menu-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
 </head>
 <body>
-    COMBAT EVLOVED 2D
 
+    <div class="menu-container">
+        <h1 class="game-title">Combat Evolved 2D</h1>
+        
+        <div class="menu-options">
+            <button class="menu-btn">QuickStart</button>
+            <button class="menu-btn">Load Game</button>
+            <button class="menu-btn">Difficulty</button>
+            <button class="menu-btn">Exit</button>
+        </div>
+    </div>
 
-    
 </body>
 </html>
