@@ -27,14 +27,31 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+
+
+
+ctx.imageSmoothingEnabled = false;
+
+//////////////////////////
+// TEXTÚRY
+//////////////////////////
+const playerImg = new Image();
+playerImg.src = "masta chief 16x16 v2.png";
+
+const gruntImg = new Image();
+gruntImg.src = "grunt 16x16 v2.png";
+
+const eliteImg = new Image();
+eliteImg.src = "elite blue 16x16 v2.png";
+
 //////////////////////////
 // HRÁČ
 //////////////////////////
 let player = {
     x: 500,    //500 obidve potom
     y: 500,
-    size: 0,
-    speed: 2.35,     //2.35 dat potom naspat
+    size: 80,
+    speed: 2.0,     //2.35 / 2.0
     angle: 0,
     hp: 100
 };
@@ -159,7 +176,17 @@ let enemies = [
     {x: 4500, y: -200, type: "grunt", hp: 2, cooldown: 0},
     {x: 4600, y: -100, type: "elite", hp: 4, cooldown: 0},
     {x: 4625, y: 50, type: "elite", hp: 4, cooldown: 0},
+    {x: 4625, y: 500, type: "elite", hp: 4, cooldown: 0},
+    {x: 4625, y: 1500, type: "elite", hp: 4, cooldown: 0},
+    {x: 4500, y: 1500, type: "grunt", hp: 2, cooldown: 0},
+    {x: 4050, y: 1250, type: "grunt", hp: 2, cooldown: 0},
+    {x: 4000, y: 1400, type: "elite", hp: 4, cooldown: 0},
+    {x: 4100, y: 1300, type: "elite", hp: 4, cooldown: 0},
+    {x: 4050, y: 1250, type: "grunt", hp: 2, cooldown: 0},
+    {x: 4050, y: 650, type: "grunt", hp: 2, cooldown: 0},
+    {x: 4100, y: 750, type: "grunt", hp: 2, cooldown: 0},
 
+//lifepody V
     {x: 4500, y: 2500, type: "grunt", hp: 2, cooldown: 0},
     {x: 4550, y: 2550, type: "grunt", hp: 2, cooldown: 0},
     {x: 4625, y: 2600, type: "elite", hp: 4, cooldown: 0},
@@ -167,8 +194,17 @@ let enemies = [
     {x: 3830, y: 2550, type: "grunt", hp: 2, cooldown: 0},
     {x: 3800, y: 2650, type: "elite", hp: 4, cooldown: 0},
     {x: 3750, y: 2600, type: "elite", hp: 4, cooldown: 0},
+    
+    {x: 3030, y: 2500, type: "grunt", hp: 2, cooldown: 0},
+    {x: 3000, y: 2650, type: "elite", hp: 4, cooldown: 0},
+    {x: 2950, y: 2500, type: "elite", hp: 4, cooldown: 0},
 
+    {x: 1330, y: 2100, type: "grunt", hp: 2, cooldown: 0},
+    {x: 1350, y: 2150, type: "grunt", hp: 2, cooldown: 0},
+    {x: 1250, y: 2100, type: "grunt", hp: 2, cooldown: 0},
 
+    {x: 1700, y: 2450, type: "elite", hp: 4, cooldown: 0},
+    {x: 1750, y: 2500, type: "elite", hp: 4, cooldown: 0},
 
 ];
 
@@ -177,10 +213,10 @@ let enemies = [
 //////////////////////////
 function collideRect(x, y, size, w) {
     return (
-        x < w.x + w.w &&
-        x + size > w.x &&
-        y < w.y + w.h &&
-        y + size > w.y
+        x - size/10 < w.x + w.w &&
+        x + size/10 > w.x &&
+        y - size/10 < w.y + w.h &&
+        y + size/10 > w.y
     );
 }
 
@@ -207,7 +243,7 @@ function updatePlayer() {
     if (!collideWithWalls(player.x, newY, player.size)) player.y = newY;
 
     player.angle = Math.atan2(mouse.y - canvas.height/2, mouse.x - canvas.width/2);
-}
+  }
 
 function updateBullets() {
     bullets.forEach((b, i) => {
@@ -252,6 +288,9 @@ function updateEnemies() {
 
         if (dist < activateDist) {
 
+            // ✅ TERAZ SA OTOČÍ LEN KEĎ ŤA "VIDÍ"
+            e.angle = Math.atan2(dy, dx);
+
             let moveX = 0;
             let moveY = 0;
 
@@ -273,7 +312,7 @@ function updateEnemies() {
             e.cooldown--;
 
             if (e.cooldown <= 0) {
-                let angle = Math.atan2(player.y - e.y, player.x - e.x);
+                let angle = Math.atan2(dy, dx);
 
                 bullets.push({
                     x: e.x,
@@ -330,12 +369,34 @@ function drawWalls(offset) {
 }
 
 function drawEnemies(offset) {
+    let enemySize = 72;
+
     enemies.forEach(e => {
-        ctx.fillStyle = (e.type === "grunt") ? "red" : "blue";
-        ctx.fillRect(e.x - offset.x, e.y - offset.y, 30, 30);
+        let img = (e.type === "grunt") ? gruntImg : eliteImg;
+
+        ctx.save();
+
+        // presun do stredu enemy
+        ctx.translate(
+            e.x - offset.x,
+            e.y - offset.y
+        );
+
+        // otočenie
+        ctx.rotate(e.angle);
+
+        // kreslenie od stredu
+        ctx.drawImage(
+            img,
+            -enemySize/2,
+            -enemySize/2,
+            enemySize,
+            enemySize
+        );
+
+        ctx.restore();
     });
 }
-
 function drawBullets(offset) {
     ctx.fillStyle = "yellow";
     bullets.forEach(b => {
@@ -348,8 +409,13 @@ function drawPlayer() {
     ctx.translate(canvas.width/2, canvas.height/2);
     ctx.rotate(player.angle);
 
-    ctx.fillStyle = "green";
-    ctx.fillRect(-15, -15, 30, 30);
+    ctx.drawImage(
+        playerImg,
+        -player.size/2,
+        -player.size/2,
+        player.size,
+        player.size
+    );
 
     ctx.restore();
 }
