@@ -1,460 +1,480 @@
 <!DOCTYPE html>
 <html lang="sk">
-<head>
-<meta charset="UTF-8">
-<title>PoA Level</title>
 
-<style>
-body {
-    margin: 0;
-    overflow: hidden;
-    background: black;
-}
-canvas {
-    display: block;
-}
-</style>
+<head>
+    <meta charset="UTF-8">
+    <title>PoA Level</title>
+
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: black;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
 </head>
 
 <body>
 
-<canvas id="gameCanvas"></canvas>
+    <canvas id="gameCanvas"></canvas>
 
-<script>
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
+        ctx.imageSmoothingEnabled = false;
 
+        //////////////////////////
+        // TEXTÚRY
+        //////////////////////////
+        const playerImg = new Image();
+        playerImg.src = "masta chief 16x16 v2.png";
 
+        const gruntImg = new Image();
+        gruntImg.src = "grunt 16x16 v2.png";
 
-ctx.imageSmoothingEnabled = false;
+        const eliteImg = new Image();
+        eliteImg.src = "elite blue 16x16 v2.png";
 
-//////////////////////////
-// TEXTÚRY
-//////////////////////////
-const playerImg = new Image();
-playerImg.src = "masta chief 16x16 v2.png";
+        //////////////////////////
+        // HRÁČ
+        //////////////////////////
+        let player = {
+            x: 500,
+            y: 500,
+            size: 80,
+            speed: 10.0,     //2.0 dat potom
+            angle: 0,
+            hp: 100
+        };
 
-const gruntImg = new Image();
-gruntImg.src = "grunt 16x16 v2.png";
+        // STENY
+        let walls = [
+            //prva miestnost
+            { x: 100, y: 150, w: 800, h: 20 },
+            { x: 100, y: 790, w: 800, h: 20 },
+            { x: 100, y: 150, w: 20, h: 660 },
+            { x: 880, y: 150, w: 20, h: 230 },
+            { x: 880, y: 580, w: 20, h: 230 },
+            { x: 400, y: 360, w: 200, h: 20 },
+            { x: 400, y: 580, w: 200, h: 20 },
+            { x: 880, y: 360, w: 700, h: 20 },
+            { x: 880, y: 580, w: 500, h: 20 },
+            { x: 1560, y: 370, w: 20, h: 420 },
+            { x: 1360, y: 580, w: 20, h: 420 },
+            { x: 1560, y: 780, w: 500, h: 20 },
+            { x: 1360, y: 980, w: 700, h: 20 },
+            //druha miestnost
+            { x: 2040, y: 980, w: 20, h: 500 },
+            { x: 2040, y: 150, w: 20, h: 650 },
+            { x: 2040, y: 1460, w: 900, h: 20 },
+            { x: 2920, y: -50, w: 20, h: 1530 },
+            { x: 2040, y: 150, w: 680, h: 20 },
+            { x: 2700, y: -270, w: 20, h: 440 },
+            { x: 2700, y: -270, w: 2000, h: 20 },
+            { x: 2920, y: -50, w: 1000, h: 20 },
+            { x: 3900, y: -50, w: 20, h: 440 },
+            //tretia miestnost
+            { x: 3900, y: -50, w: 20, h: 1530 },
+            { x: 3900, y: 1460, w: 580, h: 20 },
+            { x: 4680, y: -270, w: 20, h: 3000 },
+            //chodba lifepody
+            { x: 4460, y: 1460, w: 20, h: 540 },
+            { x: 1080, y: 1980, w: 3400, h: 20 },
+            { x: 1080, y: 1980, w: 20, h: 240 },
+            { x: 1080, y: 2200, w: 600, h: 20 },
+            { x: 3880, y: 2200, w: 600, h: 20 },
+            { x: 3080, y: 2200, w: 600, h: 20 },
+            { x: 1880, y: 2200, w: 1000, h: 20 },
+            //lp4
+            { x: 4460, y: 2200, w: 20, h: 530 },
+            { x: 4460, y: 2710, w: 240, h: 20 },
+            //lp3
+            { x: 3660, y: 2200, w: 20, h: 530 },
+            { x: 3660, y: 2710, w: 240, h: 20 },
+            { x: 3880, y: 2200, w: 20, h: 530 },
+            //lp2
+            { x: 2860, y: 2200, w: 20, h: 530 },
+            { x: 2860, y: 2710, w: 240, h: 20 },
+            { x: 3080, y: 2200, w: 20, h: 530 },
+            //lp1
+            { x: 1660, y: 2200, w: 20, h: 530 },
+            { x: 1660, y: 2710, w: 240, h: 20 },
+            { x: 1880, y: 2200, w: 20, h: 530 },
+        ];
 
-const eliteImg = new Image();
-eliteImg.src = "elite blue 16x16 v2.png";
+        // Podlahové oblasti - presne zarovnané so stenami (bez medzier)
+        let floors = [
+            // prva miestnost - celá vnútorná plocha
+            { x: 120, y: 170, w: 760, h: 620 },
+            // chodba hore (medzi 1 a 2) - horizontálna
+            { x: 880, y: 380, w: 680, h: 200 },
+            // S-zatacka - zvislá časť
+            { x: 1380, y: 380, w: 180, h: 600 },
+            // chodba dole (po S-zatacke)
+            { x: 1380, y: 800, w: 680, h: 180 },
+            // druha miestnost
+            { x: 2060, y: 170, w: 860, h: 1290 },
+            // chodba medzi 2 a 3
+            { x: 2720, y: -250, w: 1180, h: 200 },
+            // tretia miestnost
+            { x: 3920, y: -270, w: 760, h: 1730 },
+            // dlha chodba (lifepody) - horizontálna
+            { x: 1100, y: 2000, w: 3360, h: 200 },
+            // lifepod sekcia
+            { x: 1100, y: 2200, w: 3380, h: 510 },
+        ];
 
-//////////////////////////
-// HRÁČ
-//////////////////////////
-let player = {
-    x: 500,    //500 obidve potom
-    y: 500,
-    size: 80,
-    speed: 2.0,     //2.35 / 2.0
-    angle: 0,
-    hp: 100
-};
+        //////////////////////////
+        // OVLÁDANIE
+        //////////////////////////
+        let keys = {};
+        document.addEventListener("keydown", e => keys[e.key] = true);
+        document.addEventListener("keyup", e => keys[e.key] = false);
 
-// STENY
-let walls = [
-
-//prva miestnost
-    {x: 100, y: 150, w: 800, h: 20},//horna stena
-    {x: 100, y: 790, w: 800, h: 20},//dolna stena
-    {x: 100, y: 150, w: 20, h: 660},//lava stena
-        {x: 880, y: 150, w: 20, h: 230},//prava horna
-        {x: 880, y: 580, w: 20, h: 230},//prava dolna
-            {x: 400, y: 360, w: 200, h: 20},// ta vec horna
-            {x: 400, y: 580, w: 200, h: 20},// ta vec dolna
-    //   chodba medzi 1 a 2 miestnostami
-    {x: 880, y: 360, w: 700, h: 20}, //chodba horna stena
-    {x: 880, y: 580, w: 500, h: 20}, //chodba dolna stena
-
-    {x: 1560, y: 370, w: 20, h: 420},// prava strana S
-    {x: 1360, y: 580, w: 20, h: 420},// lava strana S
-    // po S
-    {x: 1560, y: 780, w: 500, h: 20}, //chodba horna stenadw
-    {x: 1360, y: 980, w: 700, h: 20}, //chodba dolna stena
-//druha miestnost
-    {x: 2040, y: 980, w: 20, h: 500},//lava dolu
-    {x: 2040, y: 150, w: 20, h: 650},//lava horna
-    {x: 2040, y: 1460, w: 900, h: 20},//dolna
-    {x: 2920, y: -50, w: 20, h: 1530},//prava
-    {x: 2040, y: 150, w: 680, h: 20},//horna
-    //chodba medzi 2 a 3 miestnostami
-    {x: 2700, y: -270, w: 20, h: 440},//lava stena
-    {x: 2700, y: -270, w: 2000, h: 20},//horna
-    {x: 2920, y: -50, w: 1000, h: 20},//dolna
-    {x: 3900, y: -50, w: 20, h: 440},//prava stena
-//tretia miestnost
-    {x: 3900, y: -50, w: 20, h: 1530},//lava
-    {x: 3900, y: 1460, w: 580, h: 20},//dolna
-    {x: 4680, y: -270, w: 20, h: 3000},//prava
-//chodba z tretej kolo lifepodov
-    {x: 4460, y: 1460, w: 20, h: 540},//lava od miestnosti 3
-    {x: 1080, y: 1980, w: 3400, h: 20},//horna
-    {x: 1080, y: 1980, w: 20, h: 240},//lava
-    {x: 1080, y: 2200, w: 600, h: 20},//nalavo od lifepodov
-    //medzi lp
-        {x: 3880, y: 2200, w: 600, h: 20},//3 a 4
-        {x: 3080, y: 2200, w: 600, h: 20},//2 a 3
-        {x: 1880, y: 2200, w: 1000, h: 20},//1 a 2
-        //lp4
-            {x: 4460, y: 2200, w: 20, h: 530},//lava lp
-            {x: 4460, y: 2710, w: 240, h: 20},//spod lp
-        //lp3
-            {x: 3660, y: 2200, w: 20, h: 530},//lava lp
-            {x: 3660, y: 2710, w: 240, h: 20},//spod lp
-            {x: 3880, y: 2200, w: 20, h: 530},//prava lp
-        //lp2
-            {x: 2860, y: 2200, w: 20, h: 530},//lava lp
-            {x: 2860, y: 2710, w: 240, h: 20},//spod lp
-            {x: 3080, y: 2200, w: 20, h: 530},//prava lp
-        //lp1   finalne
-            {x: 1660, y: 2200, w: 20, h: 530},//lava lp
-            {x: 1660, y: 2710, w: 240, h: 20},//spod lp
-            {x: 1880, y: 2200, w: 20, h: 530},//prava lp
-
-];
-
-//////////////////////////
-// OVLÁDANIE
-//////////////////////////
-let keys = {};
-document.addEventListener("keydown", e => keys[e.key] = true);
-document.addEventListener("keyup", e => keys[e.key] = false);
-
-let mouse = { x: 0, y: 0 };
-canvas.addEventListener("mousemove", e => {
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
-});
-
-//////////////////////////
-// STRELY
-//////////////////////////
-let bullets = [];
-
-canvas.addEventListener("click", () => {
-    let angle = Math.atan2(mouse.y - canvas.height/2, mouse.x - canvas.width/2);
-
-    bullets.push({
-        x: player.x,
-        y: player.y,
-        dx: Math.cos(angle) * 8,
-        dy: Math.sin(angle) * 8,
-        size: 5,
-        from: "player"
-    });
-});
-
-//////////////////////////
-// ENEMY
-//////////////////////////
-let enemies = [
-//chodba medzi 1 a 2
-    {x: 1500, y: 800, type: "grunt", hp: 2, cooldown: 0},
-    {x: 1600, y: 850, type: "grunt", hp: 2, cooldown: 0},
-    {x: 1650, y: 900, type: "grunt", hp: 2, cooldown: 0},
-//druha miestnost
-    {x: 2800, y: 1350, type: "grunt", hp: 2, cooldown: 0},
-    {x: 2850, y: 1300, type: "grunt", hp: 2, cooldown: 0},
-
-    {x: 2100, y: 300, type: "grunt", hp: 2, cooldown: 0},
-    {x: 2200, y: 250, type: "grunt", hp: 2, cooldown: 0},
-    {x: 2150, y: 200, type: "grunt", hp: 2, cooldown: 0},
-
-    {x: 2850, y: 200, type: "grunt", hp: 2, cooldown: 0},
-    {x: 2880, y: 300, type: "elite", hp: 4, cooldown: 0},
-    {x: 2800, y: 250, type: "elite", hp: 4, cooldown: 0},
-
-    {x: 3400, y: -100, type: "elite", hp: 4, cooldown: 0},
-    {x: 3350, y: -150, type: "grunt", hp: 2, cooldown: 0},
-
-    {x: 4050, y: -150, type: "grunt", hp: 2, cooldown: 0},
-    {x: 4500, y: -200, type: "grunt", hp: 2, cooldown: 0},
-    {x: 4600, y: -100, type: "elite", hp: 4, cooldown: 0},
-    {x: 4625, y: 50, type: "elite", hp: 4, cooldown: 0},
-    {x: 4625, y: 500, type: "elite", hp: 4, cooldown: 0},
-    {x: 4625, y: 1500, type: "elite", hp: 4, cooldown: 0},
-    {x: 4500, y: 1500, type: "grunt", hp: 2, cooldown: 0},
-    {x: 4050, y: 1250, type: "grunt", hp: 2, cooldown: 0},
-    {x: 4000, y: 1400, type: "elite", hp: 4, cooldown: 0},
-    {x: 4100, y: 1300, type: "elite", hp: 4, cooldown: 0},
-    {x: 4050, y: 1250, type: "grunt", hp: 2, cooldown: 0},
-    {x: 4050, y: 650, type: "grunt", hp: 2, cooldown: 0},
-    {x: 4100, y: 750, type: "grunt", hp: 2, cooldown: 0},
-
-//lifepody V
-    {x: 4500, y: 2500, type: "grunt", hp: 2, cooldown: 0},
-    {x: 4550, y: 2550, type: "grunt", hp: 2, cooldown: 0},
-    {x: 4625, y: 2600, type: "elite", hp: 4, cooldown: 0},
-
-    {x: 3830, y: 2550, type: "grunt", hp: 2, cooldown: 0},
-    {x: 3800, y: 2650, type: "elite", hp: 4, cooldown: 0},
-    {x: 3750, y: 2600, type: "elite", hp: 4, cooldown: 0},
-    
-    {x: 3030, y: 2500, type: "grunt", hp: 2, cooldown: 0},
-    {x: 3000, y: 2650, type: "elite", hp: 4, cooldown: 0},
-    {x: 2950, y: 2500, type: "elite", hp: 4, cooldown: 0},
-
-    {x: 1330, y: 2100, type: "grunt", hp: 2, cooldown: 0},
-    {x: 1350, y: 2150, type: "grunt", hp: 2, cooldown: 0},
-    {x: 1250, y: 2100, type: "grunt", hp: 2, cooldown: 0},
-
-    {x: 1700, y: 2450, type: "elite", hp: 4, cooldown: 0},
-    {x: 1750, y: 2500, type: "elite", hp: 4, cooldown: 0},
-
-];
-
-//////////////////////////
-// KOLÍZIA
-//////////////////////////
-function collideRect(x, y, size, w) {
-    return (
-        x - size/10 < w.x + w.w &&
-        x + size/10 > w.x &&
-        y - size/10 < w.y + w.h &&
-        y + size/10 > w.y
-    );
-}
-
-function collideWithWalls(x, y, size) {
-    for (let w of walls) {
-        if (collideRect(x, y, size, w)) return true;
-    }
-    return false;
-}
-
-//////////////////////////
-// UPDATE
-//////////////////////////
-function updatePlayer() {
-    let newX = player.x;
-    let newY = player.y;
-
-    if (keys["w"]) newY -= player.speed;
-    if (keys["s"]) newY += player.speed;
-    if (keys["a"]) newX -= player.speed;
-    if (keys["d"]) newX += player.speed;
-
-    if (!collideWithWalls(newX, player.y, player.size)) player.x = newX;
-    if (!collideWithWalls(player.x, newY, player.size)) player.y = newY;
-
-    player.angle = Math.atan2(mouse.y - canvas.height/2, mouse.x - canvas.width/2);
-  }
-
-function updateBullets() {
-    bullets.forEach((b, i) => {
-
-        b.x += b.dx;
-        b.y += b.dy;
-
-        // kolízia so stenou
-        for (let w of walls) {
-            if (collideRect(b.x, b.y, b.size, w)) {
-                bullets.splice(i, 1);
-                return;
-            }
-        }
-
-        // zásah hráča
-        if (b.from === "enemy") {
-            if (
-                b.x < player.x + player.size &&
-                b.x + b.size > player.x &&
-                b.y < player.y + player.size &&
-                b.y + b.size > player.y
-            ) {
-                player.hp -= 5;
-                bullets.splice(i, 1);
-            }
-        }
-    });
-}
-
-function updateEnemies() {
-    enemies.forEach(e => {
-
-        let dx = player.x - e.x;
-        let dy = player.y - e.y;
-        let dist = Math.sqrt(dx*dx + dy*dy);
-
-        let speed = (e.type === "grunt") ? 1.1 : 1.3;
-
-        let activateDist = 620;
-        let stopDist = (e.type === "grunt") ? 130 : 150;
-
-        if (dist < activateDist) {
-
-            // ✅ TERAZ SA OTOČÍ LEN KEĎ ŤA "VIDÍ"
-            e.angle = Math.atan2(dy, dx);
-
-            let moveX = 0;
-            let moveY = 0;
-
-            if (dist > stopDist) {
-                moveX = dx/dist * speed;
-                moveY = dy/dist * speed;
-            } else {
-                let strafe = (Math.random() - 0.8) * 0.80;
-                moveX = -dy/dist * strafe;
-                moveY = dx/dist * strafe;
-            }
-
-            let newX = e.x + moveX;
-            let newY = e.y + moveY;
-
-            if (!collideWithWalls(newX, e.y, 30)) e.x = newX;
-            if (!collideWithWalls(e.x, newY, 30)) e.y = newY;
-
-            e.cooldown--;
-
-            if (e.cooldown <= 0) {
-                let angle = Math.atan2(dy, dx);
-
-                bullets.push({
-                    x: e.x,
-                    y: e.y,
-                    dx: Math.cos(angle) * 5,
-                    dy: Math.sin(angle) * 5,
-                    size: 5,
-                    from: "enemy"
-                });
-
-                e.cooldown = (e.type === "grunt") ? 120 : 60;
-            }
-        }
-    });
-}
-
-function checkCollisions() {
-    bullets.forEach((b, i) => {
-        enemies.forEach((e, j) => {
-            if (
-                b.from === "player" &&
-                b.x < e.x + 30 &&
-                b.x + 5 > e.x &&
-                b.y < e.y + 30 &&
-                b.y + 5 > e.y
-            ) {
-                e.hp--;
-                bullets.splice(i, 1);
-
-                if (e.hp <= 0) enemies.splice(j, 1);
-            }
+        let mouse = { x: 0, y: 0 };
+        canvas.addEventListener("mousemove", e => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
         });
-    });
-}
 
-//////////////////////////
-// KAMERA
-//////////////////////////
-function getOffset() {
-    return {
-        x: player.x - canvas.width/2,
-        y: player.y - canvas.height/2
-    };
-}
+        //////////////////////////
+        // STRELY
+        //////////////////////////
+        let bullets = [];
 
-//////////////////////////
-// DRAW
-//////////////////////////
-function drawWalls(offset) {
-    ctx.fillStyle = "#555";
-    walls.forEach(w => {
-        ctx.fillRect(w.x - offset.x, w.y - offset.y, w.w, w.h);
-    });
-}
+        canvas.addEventListener("click", () => {
+            let angle = Math.atan2(mouse.y - canvas.height / 2, mouse.x - canvas.width / 2);
+            bullets.push({
+                x: player.x,
+                y: player.y,
+                dx: Math.cos(angle) * 8,
+                dy: Math.sin(angle) * 8,
+                size: 5,
+                from: "player"
+            });
+        });
 
-function drawEnemies(offset) {
-    let enemySize = 72;
+        //////////////////////////
+        // ENEMY
+        //////////////////////////
+        let enemies = [
+            //chodba medzi 1 a 2
+            { x: 1500, y: 800, type: "grunt", hp: 2, cooldown: 0 },
+            { x: 1600, y: 850, type: "grunt", hp: 2, cooldown: 0 },
+            { x: 1650, y: 900, type: "grunt", hp: 2, cooldown: 0 },
+            //druha miestnost
+            { x: 2800, y: 1350, type: "grunt", hp: 2, cooldown: 0 },
+            { x: 2850, y: 1300, type: "grunt", hp: 2, cooldown: 0 },
+            { x: 2100, y: 300, type: "grunt", hp: 2, cooldown: 0 },
+            { x: 2200, y: 250, type: "grunt", hp: 2, cooldown: 0 },
+            { x: 2150, y: 200, type: "grunt", hp: 2, cooldown: 0 },
+            { x: 2850, y: 200, type: "grunt", hp: 2, cooldown: 0 },
+            { x: 2880, y: 300, type: "elite", hp: 4, cooldown: 0 },
+            { x: 2800, y: 250, type: "elite", hp: 4, cooldown: 0 },
+            { x: 3400, y: -100, type: "elite", hp: 4, cooldown: 0 },
+            { x: 3350, y: -150, type: "grunt", hp: 2, cooldown: 0 },
+            { x: 4050, y: -150, type: "grunt", hp: 2, cooldown: 0 },
+            { x: 4500, y: -200, type: "grunt", hp: 2, cooldown: 0 },
+            { x: 4600, y: -100, type: "elite", hp: 4, cooldown: 0 },
+            { x: 4625, y: 50, type: "elite", hp: 4, cooldown: 0 },
+            { x: 4625, y: 500, type: "elite", hp: 4, cooldown: 0 },
+            { x: 4625, y: 1500, type: "elite", hp: 4, cooldown: 0 },
+            { x: 4500, y: 1500, type: "grunt", hp: 2, cooldown: 0 },
+            { x: 4050, y: 1250, type: "grunt", hp: 2, cooldown: 0 },
+            { x: 4000, y: 1400, type: "elite", hp: 4, cooldown: 0 },
+            { x: 4100, y: 1300, type: "elite", hp: 4, cooldown: 0 },
+            { x: 4050, y: 1250, type: "grunt", hp: 2, cooldown: 0 },
+            { x: 4050, y: 650, type: "grunt", hp: 2, cooldown: 0 },
+            { x: 4100, y: 750, type: "grunt", hp: 2, cooldown: 0 },
+            //lifepody
+            { x: 4500, y: 2500, type: "grunt", hp: 2, cooldown: 0 },
+            { x: 4550, y: 2550, type: "grunt", hp: 2, cooldown: 0 },
+            { x: 4625, y: 2600, type: "elite", hp: 4, cooldown: 0 },
+            { x: 3830, y: 2550, type: "grunt", hp: 2, cooldown: 0 },
+            { x: 3800, y: 2650, type: "elite", hp: 4, cooldown: 0 },
+            { x: 3750, y: 2600, type: "elite", hp: 4, cooldown: 0 },
+            { x: 3030, y: 2500, type: "grunt", hp: 2, cooldown: 0 },
+            { x: 3000, y: 2650, type: "elite", hp: 4, cooldown: 0 },
+            { x: 2950, y: 2500, type: "elite", hp: 4, cooldown: 0 },
+            { x: 1330, y: 2100, type: "grunt", hp: 2, cooldown: 0 },
+            { x: 1350, y: 2150, type: "grunt", hp: 2, cooldown: 0 },
+            { x: 1250, y: 2100, type: "grunt", hp: 2, cooldown: 0 },
+            { x: 1700, y: 2450, type: "elite", hp: 4, cooldown: 0 },
+            { x: 1750, y: 2500, type: "elite", hp: 4, cooldown: 0 },
+        ];
 
-    enemies.forEach(e => {
-        let img = (e.type === "grunt") ? gruntImg : eliteImg;
+        //////////////////////////
+        // KOLÍZIA
+        //////////////////////////
+        function collideRect(x, y, size, w) {
+            return (
+                x - size / 10 < w.x + w.w &&
+                x + size / 10 > w.x &&
+                y - size / 10 < w.y + w.h &&
+                y + size / 10 > w.y
+            );
+        }
 
-        ctx.save();
+        function collideWithWalls(x, y, size) {
+            for (let w of walls) {
+                if (collideRect(x, y, size, w)) return true;
+            }
+            return false;
+        }
 
-        // presun do stredu enemy
-        ctx.translate(
-            e.x - offset.x,
-            e.y - offset.y
-        );
+        //////////////////////////
+        // UPDATE
+        //////////////////////////
+        function updatePlayer() {
+            let newX = player.x;
+            let newY = player.y;
+            if (keys["w"]) newY -= player.speed;
+            if (keys["s"]) newY += player.speed;
+            if (keys["a"]) newX -= player.speed;
+            if (keys["d"]) newX += player.speed;
+            if (!collideWithWalls(newX, player.y, player.size)) player.x = newX;
+            if (!collideWithWalls(player.x, newY, player.size)) player.y = newY;
+            player.angle = Math.atan2(mouse.y - canvas.height / 2, mouse.x - canvas.width / 2);
+        }
 
-        // otočenie
-        ctx.rotate(e.angle);
+        function updateBullets() {
+            bullets.forEach((b, i) => {
+                b.x += b.dx;
+                b.y += b.dy;
+                for (let w of walls) {
+                    if (collideRect(b.x, b.y, b.size, w)) {
+                        bullets.splice(i, 1);
+                        return;
+                    }
+                }
+                if (b.from === "enemy") {
+                    if (
+                        b.x < player.x + player.size &&
+                        b.x + b.size > player.x &&
+                        b.y < player.y + player.size &&
+                        b.y + b.size > player.y
+                    ) {
+                        player.hp -= 5;
+                        bullets.splice(i, 1);
+                    }
+                }
+            });
+        }
 
-        // kreslenie od stredu
-        ctx.drawImage(
-            img,
-            -enemySize/2,
-            -enemySize/2,
-            enemySize,
-            enemySize
-        );
+        function updateEnemies() {
+            enemies.forEach(e => {
+                let dx = player.x - e.x;
+                let dy = player.y - e.y;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+                let speed = (e.type === "grunt") ? 1.1 : 1.3;
+                let activateDist = 620;
+                let stopDist = (e.type === "grunt") ? 130 : 150;
+                if (dist < activateDist) {
+                    e.angle = Math.atan2(dy, dx);
+                    let moveX = 0;
+                    let moveY = 0;
+                    if (dist > stopDist) {
+                        moveX = dx / dist * speed;
+                        moveY = dy / dist * speed;
+                    } else {
+                        let strafe = (Math.random() - 0.8) * 0.80;
+                        moveX = -dy / dist * strafe;
+                        moveY = dx / dist * strafe;
+                    }
+                    let newX = e.x + moveX;
+                    let newY = e.y + moveY;
+                    if (!collideWithWalls(newX, e.y, 30)) e.x = newX;
+                    if (!collideWithWalls(e.x, newY, 30)) e.y = newY;
+                    e.cooldown--;
+                    if (e.cooldown <= 0) {
+                        let angle = Math.atan2(dy, dx);
+                        bullets.push({
+                            x: e.x,
+                            y: e.y,
+                            dx: Math.cos(angle) * 5,
+                            dy: Math.sin(angle) * 5,
+                            size: 5,
+                            from: "enemy",
+                            enemyType: e.type
+                        });
+                        e.cooldown = (e.type === "grunt") ? 120 : 60;
+                    }
+                }
+            });
+        }
 
-        ctx.restore();
-    });
-}
-function drawBullets(offset) {
-    ctx.fillStyle = "yellow";
-    bullets.forEach(b => {
-        ctx.fillRect(b.x - offset.x, b.y - offset.y, 5, 5);
-    });
-}
+        function checkCollisions() {
+            bullets.forEach((b, i) => {
+                enemies.forEach((e, j) => {
+                    if (
+                        b.from === "player" &&
+                        b.x < e.x + 30 &&
+                        b.x + 5 > e.x &&
+                        b.y < e.y + 30 &&
+                        b.y + 5 > e.y
+                    ) {
+                        e.hp--;
+                        bullets.splice(i, 1);
+                        if (e.hp <= 0) enemies.splice(j, 1);
+                    }
+                });
+            });
+        }
 
-function drawPlayer() {
-    ctx.save();
-    ctx.translate(canvas.width/2, canvas.height/2);
-    ctx.rotate(player.angle);
+        //////////////////////////
+        // KAMERA
+        //////////////////////////
+        function getOffset() {
+            return {
+                x: player.x - canvas.width / 2,
+                y: player.y - canvas.height / 2
+            };
+        }
 
-    ctx.drawImage(
-        playerImg,
-        -player.size/2,
-        -player.size/2,
-        player.size,
-        player.size
-    );
+        //////////////////////////
+        // DRAW
+        //////////////////////////
+        function drawBackground(offset) {
+            // Vonkajšie pozadie
+            ctx.fillStyle = "#1a1a2e";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.restore();
-}
+            const gridSize = 40;
 
-//////////////////////////
-// HP BAR
-//////////////////////////
-function drawHP() {
-    ctx.fillStyle = "red";
-    ctx.fillRect(canvas.width/2 - 150, 20, 300, 20);
+            floors.forEach(f => {
+                // Podlaha
+                ctx.fillStyle = "#3a3a3a";
+                ctx.fillRect(f.x - offset.x, f.y - offset.y, f.w, f.h);
 
-    ctx.fillStyle = "lime";
-    ctx.fillRect(canvas.width/2 - 150, 20, player.hp * 3, 20);
-}
+                // Mriežka - clip na floor, globálne zarovnaná
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(f.x - offset.x, f.y - offset.y, f.w, f.h);
+                ctx.clip();
 
-//////////////////////////
-// LOOP
-//////////////////////////
-function gameLoop() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = "rgba(0,0,0,0.18)";
+                ctx.lineWidth = 1;
 
-    updatePlayer();
-    updateBullets();
-    updateEnemies();
-    checkCollisions();
+                // Globálne zarovnanie - zaokrúhliť na gridSize
+                const startX = Math.floor((f.x) / gridSize) * gridSize;
+                const startY = Math.floor((f.y) / gridSize) * gridSize;
+                const endX = f.x + f.w + gridSize;
+                const endY = f.y + f.h + gridSize;
 
-    let offset = getOffset();
+                for (let gx = startX; gx <= endX; gx += gridSize) {
+                    ctx.beginPath();
+                    ctx.moveTo(gx - offset.x, f.y - offset.y);
+                    ctx.lineTo(gx - offset.x, f.y + f.h - offset.y);
+                    ctx.stroke();
+                }
+                for (let gy = startY; gy <= endY; gy += gridSize) {
+                    ctx.beginPath();
+                    ctx.moveTo(f.x - offset.x, gy - offset.y);
+                    ctx.lineTo(f.x + f.w - offset.x, gy - offset.y);
+                    ctx.stroke();
+                }
 
-    drawWalls(offset);
-    drawEnemies(offset);
-    drawBullets(offset);
-    drawPlayer();
-    drawHP();
+                ctx.restore();
+            });
+        }
 
-    requestAnimationFrame(gameLoop);
-}
+        function drawWalls(offset) {
+            ctx.fillStyle = "#555";
+            walls.forEach(w => {
+                ctx.fillRect(w.x - offset.x, w.y - offset.y, w.w, w.h);
+            });
+        }
 
-gameLoop();
-</script>
+        function drawEnemies(offset) {
+            let enemySize = 72;
+            enemies.forEach(e => {
+                let img = (e.type === "grunt") ? gruntImg : eliteImg;
+                ctx.save();
+                ctx.translate(e.x - offset.x, e.y - offset.y);
+                ctx.rotate(e.angle);
+                ctx.drawImage(img, -enemySize / 2, -enemySize / 2, enemySize, enemySize);
+                ctx.restore();
+            });
+        }
+
+        function drawBullets(offset) {
+            bullets.forEach(b => {
+                if (b.from === "player") {
+                    ctx.save();
+                    ctx.shadowColor = "orange";
+                    ctx.shadowBlur = 8;
+                    ctx.fillStyle = "#ffcc00";
+                    ctx.fillRect(b.x - offset.x - 3, b.y - offset.y - 3, 8, 8);
+                    ctx.fillStyle = "#ff8800";
+                    ctx.fillRect(b.x - offset.x - 1, b.y - offset.y - 1, 4, 4);
+                    ctx.restore();
+                } else if (b.enemyType === "elite") {
+                    ctx.save();
+                    ctx.shadowColor = "#0000ff";
+                    ctx.shadowBlur = 10;
+                    ctx.fillStyle = "#0066ff";
+                    ctx.fillRect(b.x - offset.x - 3, b.y - offset.y - 3, 8, 8);
+                    ctx.fillStyle = "#aaddff";
+                    ctx.fillRect(b.x - offset.x - 1, b.y - offset.y - 1, 4, 4);
+                    ctx.restore();
+                } else {
+                    ctx.save();
+                    ctx.shadowColor = "#00ff44";
+                    ctx.shadowBlur = 10;
+                    ctx.fillStyle = "#00cc33";
+                    ctx.fillRect(b.x - offset.x - 3, b.y - offset.y - 3, 8, 8);
+                    ctx.fillStyle = "#aaffbb";
+                    ctx.fillRect(b.x - offset.x - 1, b.y - offset.y - 1, 4, 4);
+                    ctx.restore();
+                }
+            });
+        }
+
+        function drawPlayer() {
+            ctx.save();
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.rotate(player.angle);
+            ctx.drawImage(playerImg, -player.size / 2, -player.size / 2, player.size, player.size);
+            ctx.restore();
+        }
+
+        function drawHP() {
+            ctx.fillStyle = "red";
+            ctx.fillRect(canvas.width / 2 - 150, 20, 300, 20);
+            ctx.fillStyle = "lime";
+            ctx.fillRect(canvas.width / 2 - 150, 20, player.hp * 3, 20);
+        }
+
+        //////////////////////////
+        // LOOP
+        //////////////////////////
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            updatePlayer();
+            updateBullets();
+            updateEnemies();
+            checkCollisions();
+            let offset = getOffset();
+            drawBackground(offset);
+            drawWalls(offset);
+            drawEnemies(offset);
+            drawBullets(offset);
+            drawPlayer();
+            drawHP();
+            requestAnimationFrame(gameLoop);
+        }
+
+        gameLoop();
+    </script>
 
 </body>
+
 </html>
