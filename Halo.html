@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <title>PoA Level</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
     <style>
         body {
@@ -35,11 +34,8 @@
         //////////////////////////
         // TEXTÚRY
         //////////////////////////
-        const dmrPlayerImg = new Image();
-        dmrPlayerImg.src = "masta chif dmr.png";
-
-        const arPlayerImg = new Image();
-        arPlayerImg.src = "masta chir ar.png";
+        const playerImg = new Image();
+        playerImg.src = "masta chief 16x16 v2.png";
 
         const gruntImg = new Image();
         gruntImg.src = "grunt 16x16 v2.png";
@@ -47,201 +43,111 @@
         const eliteImg = new Image();
         eliteImg.src = "elite blue 16x16 v2.png";
 
-
-
-
-        const hudFont = new FontFace(
-            "HaloFont",
-            "url(HaloReachMenu.ttf)"
-        );
-
-        hudFont.load().then(font => {
-
-            document.fonts.add(font);
-        });
-
-        ////////////
-        //zbrane    pif paf
-        //////////
-
-        let weapons = {
-            dmr: {
-                damage: 2,
-                bulletSpeed: 14,
-                fireRate: 250, // ms medzi výstrelmi
-                spread: 0.03,
-                automatic: false,
-                reloadTime: 1800,
-                magSize: 10,
-                color: "#ffd000"
-            },
-
-            ar: {
-                damage: 0.8,
-                bulletSpeed: 11,
-                fireRate: 135,
-                spread: 0.16,
-                automatic: true,
-                reloadTime: 2200,
-                magSize: 36,
-                color: "#ff8800"
-            }
-        };
-
-
-
         //////////////////////////
         // HRÁČ
         //////////////////////////
-
         let player = {
             x: 500,        //500 obidve
             y: 500,
             size: 80,
-            speed: 2.0,     //2.0 dat potom
+            speed: 10.0,     //2.0 dat potom
             angle: 0,
-
-            hp: 70,
-            maxHp: 70,
-            lastHitTime: 0,
-            lastHitTime: Date.now(),
-
-            weapon: "dmr",
-            ammo: 12,
-            reloading: false,
-            lastShot: 0,
+            hp: 100
         };
 
-
-
-
-
-
-
-        const hpBar = {
-
-            width: 400,
-            height: 22,
-
-            backgroundColor: "rgba(80,80,80,0.6)",
-            hpColor: "rgba(115,210,255,0.92)",
-
-            borderColor: "white",
-
-            y: 30
-        };
-
-
-
-        //regeneracia zivotov
-        function regenerateHp() {
-
-            // 3 sekundy bez damage
-            if (Date.now() - player.lastHitTime > 3500) {
-
-                player.hp += 0.10;
-
-                // max hp limit
-                if (player.hp > player.maxHp) {
-                    player.hp = player.maxHp;
-                }
-            }
-        }
         // STENY
 
+let walls = [
 
+//prva miestnost
+    {x: 100, y: 150, w: 800, h: 20},//horna stena
+    {x: 100, y: 790, w: 800, h: 20},//dolna stena
+    {x: 100, y: 150, w: 20, h: 660},//lava stena
+        {x: 880, y: 150, w: 20, h: 230},//prava horna
+        {x: 880, y: 580, w: 20, h: 230},//prava dolna
+            {x: 400, y: 360, w: 200, h: 20},// ta vec horna
+               {x: 555, y: 210, w: -110, h: 110},// ta vec hornejsia 
+            {x: 400, y: 580, w: 200, h: 20},// ta vec dolna
+                {x: 555, y: 640, w: -110, h: 110},// ta vec hornejsia 
 
-        let walls = [
+    //   chodba medzi 1 a 2 miestnostami
+    {x: 880, y: 360, w: 700, h: 20}, //chodba horna stena
+    {x: 880, y: 580, w: 500, h: 20}, //chodba dolna stena
 
-            //prva miestnost
-            { x: 100, y: 150, w: 800, h: 20 },//horna stena
-            { x: 100, y: 790, w: 800, h: 20 },//dolna stena
-            { x: 100, y: 150, w: 20, h: 660 },//lava stena
-            { x: 880, y: 150, w: 20, h: 230 },//prava horna
-            { x: 880, y: 580, w: 20, h: 230 },//prava dolna
-            { x: 400, y: 360, w: 200, h: 20 },// ta vec horna
-            { x: 555, y: 210, w: -110, h: 110 },// ta vec hornejsia 
-            { x: 400, y: 580, w: 200, h: 20 },// ta vec dolna
-            { x: 555, y: 640, w: -110, h: 110 },// ta vec hornejsia 
-
-            //   chodba medzi 1 a 2 miestnostami
-            { x: 880, y: 360, w: 700, h: 20 }, //chodba horna stena
-            { x: 880, y: 580, w: 500, h: 20 }, //chodba dolna stena
-
-            { x: 1560, y: 370, w: 20, h: 420 },// prava strana S
-            { x: 1360, y: 580, w: 20, h: 420 },// lava strana S
-            // po S
-            { x: 1560, y: 780, w: 650, h: 20 }, //chodba horna stenadw
-            { x: 1360, y: 980, w: 700, h: 20 }, //chodba dolna stena
-            //druha miestnost
-            { x: 2040, y: 980, w: 20, h: 500 },//lava dolu
-            { x: 2040, y: 150, w: 20, h: 650 },//lava horna
-            { x: 2040, y: 1460, w: 900, h: 20 },//dolna
-            { x: 2920, y: -50, w: 20, h: 1530 },//prava
-            { x: 2040, y: 150, w: 680, h: 20 },//horna
-            //kadejake veci
-            { x: 2040, y: 550, w: 150, h: 150 },
-            { x: 2040, y: 350, w: 150, h: 150 },
-
-            { x: 2410, y: 780, w: 520, h: 20 },
-
+    {x: 1560, y: 370, w: 20, h: 420},// prava strana S
+    {x: 1360, y: 580, w: 20, h: 420},// lava strana S
+    // po S
+    {x: 1560, y: 780, w: 650, h: 20}, //chodba horna stenadw
+    {x: 1360, y: 980, w: 700, h: 20}, //chodba dolna stena
+//druha miestnost
+    {x: 2040, y: 980, w: 20, h: 500},//lava dolu
+    {x: 2040, y: 150, w: 20, h: 650},//lava horna
+    {x: 2040, y: 1460, w: 900, h: 20},//dolna
+    {x: 2920, y: -50, w: 20, h: 1530},//prava
+    {x: 2040, y: 150, w: 680, h: 20},//horna
+        //kadejake veci
+                        {x: 2040, y: 550, w: 150, h: 150},
+                        {x: 2040, y: 350, w: 150, h: 150},
+                  
+                    {x: 2410, y: 780, w: 520, h: 20},
+                    
 
 
 
 
-            //chodba medzi 2 a 3 miestnostami
-            { x: 2700, y: -270, w: 20, h: 540 },//lava stena
-            { x: 2700, y: -270, w: 2000, h: 20 },//horna
-            { x: 2920, y: -50, w: 1000, h: 20 },//dolna
-            { x: 3900, y: -50, w: 20, h: 440 },//prava stena
-            //tretia miestnost
-            { x: 3900, y: -50, w: 20, h: 1530 },//lava
-            { x: 3900, y: 1460, w: 580, h: 20 },//dolna
-            { x: 4680, y: -270, w: 20, h: 3000 },//prava
-            //vnutri kadeco
-            { x: 4100, y: 200, w: 400, h: 20 },
-            { x: 4100, y: 820, w: 400, h: 20 },
-            { x: 4312, y: 200, w: -10, h: 620 },
-            { x: 4250, y: 270, w: -100, h: 100 },
-            { x: 4470, y: 270, w: -100, h: 100 },
-            { x: 4250, y: 470, w: -100, h: 100 },
-            { x: 4470, y: 470, w: -100, h: 100 },
-            { x: 4250, y: 670, w: -100, h: 100 },
-            { x: 4470, y: 670, w: -100, h: 100 },
-            { x: 4100, y: 1000, w: 400, h: 20 },
+    //chodba medzi 2 a 3 miestnostami
+    {x: 2700, y: -270, w: 20, h: 540},//lava stena
+    {x: 2700, y: -270, w: 2000, h: 20},//horna
+    {x: 2920, y: -50, w: 1000, h: 20},//dolna
+    {x: 3900, y: -50, w: 20, h: 440},//prava stena
+//tretia miestnost
+    {x: 3900, y: -50, w: 20, h: 1530},//lava
+    {x: 3900, y: 1460, w: 580, h: 20},//dolna
+    {x: 4680, y: -270, w: 20, h: 3000},//prava
+        //vnutri kadeco
+            {x: 4100, y: 200, w: 400, h:20},
+            {x: 4100, y: 820, w: 400, h:20},
+            {x: 4312, y: 200, w: -10, h:620},
+                {x: 4250, y: 270, w: -100, h:100},
+                {x: 4470, y: 270, w: -100, h:100},
+                {x: 4250, y: 470, w: -100, h:100},
+                {x: 4470, y: 470, w: -100, h:100},
+                {x: 4250, y: 670, w: -100, h:100},
+                {x: 4470, y: 670, w: -100, h:100},
+                {x: 4100, y: 1000, w: 400, h:20},
 
-            { x: 3970, y: 1340, w: 100, h: 100 },
-            { x: 4130, y: 1340, w: 100, h: 100 },
-            { x: 4290, y: 1340, w: 100, h: 100 },
+                {x: 3970, y: 1340, w: 100, h: 100},
+                {x: 4130, y: 1340, w: 100, h: 100},
+                {x: 4290, y: 1340, w: 100, h: 100},
 
 
-            //chodba z tretej kolo lifepodov
-            { x: 4460, y: 1460, w: 20, h: 540 },//lava od miestnosti 3
-            { x: 1080, y: 1980, w: 3400, h: 20 },//horna
-            { x: 1080, y: 1980, w: 20, h: 240 },//lava
-            { x: 1080, y: 2200, w: 600, h: 20 },//nalavo od lifepodov
-            //medzi lp
-            { x: 3880, y: 2200, w: 600, h: 20 },//3 a 4
-            { x: 3080, y: 2200, w: 600, h: 20 },//2 a 3
-            { x: 1880, y: 2200, w: 1000, h: 20 },//1 a 2
-            //lp4
-            { x: 4460, y: 2200, w: 20, h: 530 },//lava lp
-            { x: 4460, y: 2710, w: 240, h: 20 },//spod lp
-            //lp3
-            { x: 3660, y: 2200, w: 20, h: 530 },//lava lp
-            { x: 3660, y: 2710, w: 240, h: 20 },//spod lp
-            { x: 3880, y: 2200, w: 20, h: 530 },//prava lp
-            //lp2
-            { x: 2860, y: 2200, w: 20, h: 530 },//lava lp
-            { x: 2860, y: 2710, w: 240, h: 20 },//spod lp
-            { x: 3080, y: 2200, w: 20, h: 530 },//prava lp
-            //lp1   finalne
-            { x: 1660, y: 2200, w: 20, h: 730 },//lava lp
-            { x: 1660, y: 2910, w: 240, h: -200 },//spod lp
-            { x: 1660, y: 2900, w: 240, h: 350 },//spod lp
-            { x: 1880, y: 2200, w: 20, h: 730 },//prava lp
+//chodba z tretej kolo lifepodov
+    {x: 4460, y: 1460, w: 20, h: 540},//lava od miestnosti 3
+    {x: 1080, y: 1980, w: 3400, h: 20},//horna
+    {x: 1080, y: 1980, w: 20, h: 240},//lava
+    {x: 1080, y: 2200, w: 600, h: 20},//nalavo od lifepodov
+    //medzi lp
+        {x: 3880, y: 2200, w: 600, h: 20},//3 a 4
+        {x: 3080, y: 2200, w: 600, h: 20},//2 a 3
+        {x: 1880, y: 2200, w: 1000, h: 20},//1 a 2
+        //lp4
+            {x: 4460, y: 2200, w: 20, h: 530},//lava lp
+            {x: 4460, y: 2710, w: 240, h: 20},//spod lp
+        //lp3
+            {x: 3660, y: 2200, w: 20, h: 530},//lava lp
+            {x: 3660, y: 2710, w: 240, h: 20},//spod lp
+            {x: 3880, y: 2200, w: 20, h: 530},//prava lp
+        //lp2
+            {x: 2860, y: 2200, w: 20, h: 530},//lava lp
+            {x: 2860, y: 2710, w: 240, h: 20},//spod lp
+            {x: 3080, y: 2200, w: 20, h: 530},//prava lp
+        //lp1   finalne
+            {x: 1660, y: 2200, w: 20, h: 730},//lava lp
+            {x: 1660, y: 2910, w: 240, h: -200},//spod lp
+            {x: 1660, y: 2900, w: 240, h: 350},//spod lp
+            {x: 1880, y: 2200, w: 20, h: 730},//prava lp
 
-        ];
+];
 
 
 
@@ -264,14 +170,14 @@
             { x: 2720, y: -250, w: 200, h: 420 },
             // tretia miestnost
             { x: 3920, y: -270, w: 760, h: 1730 },
-            { x: 4460, y: 1460, w: 220, h: 1270 },
+            {x: 4460, y: 1460, w: 220, h: 1270},
             // dlha chodba (lifepody) - horizontálna
             { x: 1100, y: 2000, w: 3380, h: 200 },
             // lifepod sekcia
-            { x: 4460, y: 2200, w: 20, h: 530 },//lava lp
-            { x: 3660, y: 2200, w: 220, h: 530 },//lava lp
-            { x: 2860, y: 2200, w: 220, h: 530 },//lava lp
-            { x: 1660, y: 2200, w: 220, h: 530 },//lava lp
+            {x: 4460, y: 2200, w: 20, h: 530},//lava lp
+            {x: 3660, y: 2200, w: 220, h: 530},//lava lp
+            {x: 2860, y: 2200, w: 220, h: 530},//lava lp
+            {x: 1660, y: 2200, w: 220, h: 530},//lava lp
 
 
 
@@ -296,170 +202,16 @@
         let bullets = [];
 
         canvas.addEventListener("click", () => {
-
-            if (!weapons[player.weapon].automatic) {
-                shoot();
-            }
-        });
-
-        ///////////////////
-        //automaticke stielanie
-        ///////////////
-        let mouseDown = false;
-
-        canvas.addEventListener("mousedown", () => {
-            mouseDown = true;
-        });
-
-        canvas.addEventListener("mouseup", () => {
-            mouseDown = false;
-        });
-
-
-
-
-
-
-        function shoot() {
-
-            let weapon = weapons[player.weapon];
-
-            if (player.reloading) return;
-
-            if (player.ammo <= 0) {
-
-                reloadWeapon();
-                return;
-            }
-
-            let now = Date.now();
-
-            if (now - player.lastShot < weapon.fireRate) return;
-
-            player.lastShot = now;
-
-            player.ammo--;
-
-            let angle = Math.atan2(
-                mouse.y - canvas.height / 2,
-                mouse.x - canvas.width / 2
-            );
-
-            angle += (Math.random() - 0.5) * weapon.spread;
-
+            let angle = Math.atan2(mouse.y - canvas.height / 2, mouse.x - canvas.width / 2);
             bullets.push({
-
                 x: player.x,
                 y: player.y,
-
-                dx: Math.cos(angle) * weapon.bulletSpeed,
-                dy: Math.sin(angle) * weapon.bulletSpeed,
-
+                dx: Math.cos(angle) * 8,
+                dy: Math.sin(angle) * 8,
                 size: 5,
-
-                from: "player",
-
-                damage: weapon.damage,
-
-                life: 100
+                from: "player"
             });
-        }
-
-
-
-
-
-
-
-
-
-        function reloadWeapon() {
-
-            if (player.reloading) return;
-
-            player.reloading = true;
-
-            setTimeout(() => {
-
-                player.ammo = weapons[player.weapon].magSize;
-
-                player.reloading = false;
-
-            }, weapons[player.weapon].reloadTime);
-        }
-
-
-
-
-
-
-        //tlacitka na menenie zbrani
-
-        document.addEventListener("keydown", e => {
-
-            if (e.key === "+") {
-
-                player.weapon = "dmr";
-
-                player.ammo = weapons.dmr.magSize;
-            }
-
-            if (e.key === "ľ") {
-
-                player.weapon = "ar";
-
-                player.ammo = weapons.ar.magSize;
-            }
         });
-        document.addEventListener("keydown", e => {
-
-    if (e.key.toLowerCase() === "r") {
-
-        reloadWeapon();
-    }
-});
-
-
-////////////
-//hud
-//////////
-function drawAmmo() {
-
-    let weapon = weapons[player.weapon];
-
-ctx.font = "32px 'Press Start 2P'";
-    ctx.textAlign = "right";
-
-    ctx.fillStyle = "white";
-
-    ctx.shadowColor = "black";
-    ctx.shadowBlur = 8;
-
-    ctx.fillText(
-        `${player.ammo}/${weapon.magSize}`,
-        canvas.width - 40,
-        50
-    );
-
-    if (player.reloading) {
-
-        ctx.fillStyle = "#66ccff";
-
-        ctx.fillText(
-            "RELOADING",
-            canvas.width - 40,
-            90
-        );
-    }
-
-    ctx.shadowBlur = 0;
-}
-
-
-
-
-
-
 
         //////////////////////////
         // ENEMY
@@ -515,7 +267,7 @@ ctx.font = "32px 'Press Start 2P'";
         // exit
         /////////////
 
-        let exitZone = { x: 1460, y: 2710, w: 440, h: 200 }
+        let exitZone = {x: 1460, y: 2710, w: 440, h: 200}
 
         let fading = false;
         let fadeAlpha = 0;
@@ -524,41 +276,41 @@ ctx.font = "32px 'Press Start 2P'";
 
 
 
-        function checkLevelEnd() {
+function checkLevelEnd() {
 
-            if (
-                player.x + player.size / 2 > exitZone.x &&
-                player.x - player.size / 2 < exitZone.x + exitZone.w &&
-                player.y + player.size / 2 > exitZone.y &&
-                player.y - player.size / 2 < exitZone.y + exitZone.h
-            ) {
+    if (
+        player.x + player.size/2 > exitZone.x &&
+        player.x - player.size/2 < exitZone.x + exitZone.w &&
+        player.y + player.size/2 > exitZone.y &&
+        player.y - player.size/2 < exitZone.y + exitZone.h
+    ) {
 
-                //ďalší level
-                fading = true;
-            }
+        // ďalší level
+        fading = true;
+    }
+}
+
+function updateFade() {
+
+    if (fading) {
+
+        fadeAlpha += 0.01;
+
+        if (fadeAlpha >= 1) {
+            window.location.href = "Halo.html";
         }
-
-        function updateFade() {
-
-            if (fading) {
-
-                fadeAlpha += 0.01;
-
-                if (fadeAlpha >= 1) {
-                    window.location.href = "Halo.html";
-                }
-            }
-        }
+    }
+}
 
 
 
 
-        function drawFade() {
+function drawFade() {
 
-            ctx.fillStyle = `rgba(255,255,255,${fadeAlpha})`;
+    ctx.fillStyle = `rgba(255,255,255,${fadeAlpha})`;
 
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
         //////////////////////////
         // KOLÍZIA
         //////////////////////////
@@ -597,12 +349,6 @@ ctx.font = "32px 'Press Start 2P'";
             bullets.forEach((b, i) => {
                 b.x += b.dx;
                 b.y += b.dy;
-                b.life--;
-
-                if (b.life <= 0) {
-                    bullets.splice(i, 1);
-                    return;
-                }
                 for (let w of walls) {
                     if (collideRect(b.x, b.y, b.size, w)) {
                         bullets.splice(i, 1);
@@ -617,8 +363,6 @@ ctx.font = "32px 'Press Start 2P'";
                         b.y + b.size > player.y
                     ) {
                         player.hp -= 5;
-
-                        player.lastHitTime = Date.now();
                         bullets.splice(i, 1);
                     }
                 }
@@ -652,7 +396,6 @@ ctx.font = "32px 'Press Start 2P'";
                     e.cooldown--;
                     if (e.cooldown <= 0) {
                         let angle = Math.atan2(dy, dx);
-                        angle += (Math.random() - 0.5) * 0.2;
                         bullets.push({
                             x: e.x,
                             y: e.y,
@@ -678,7 +421,7 @@ ctx.font = "32px 'Press Start 2P'";
                         b.y < e.y + 30 &&
                         b.y + 5 > e.y
                     ) {
-                        e.hp -= b.damage;
+                        e.hp--;
                         bullets.splice(i, 1);
                         if (e.hp <= 0) enemies.splice(j, 1);
                     }
@@ -799,98 +542,39 @@ ctx.font = "32px 'Press Start 2P'";
             ctx.save();
             ctx.translate(canvas.width / 2, canvas.height / 2);
             ctx.rotate(player.angle);
-            let currentImg =
-                player.weapon === "dmr"
-                    ? dmrPlayerImg
-                    : arPlayerImg;
-
-            ctx.drawImage(
-                currentImg,
-                -player.size / 2,
-                -player.size / 2,
-                player.size,
-                player.size
-            );
+            ctx.drawImage(playerImg, -player.size / 2, -player.size / 2, player.size, player.size);
             ctx.restore();
         }
 
         function drawHP() {
-
-            let x = canvas.width / 2 - hpBar.width / 2;
-
-            // background
-            ctx.fillStyle = hpBar.backgroundColor;
-            ctx.fillRect(
-                x,
-                hpBar.y,
-                hpBar.width,
-                hpBar.height
-            );
-
-            // hp percent
-            let hpPercent = player.hp / player.maxHp;
-
-            // 🔥 clamp
-            if (hpPercent < 0) hpPercent = 0;
-
-            // actual hp
-            ctx.fillStyle = hpBar.hpColor;
-            ctx.fillRect(
-                x,
-                hpBar.y,
-                hpBar.width * hpPercent,
-                hpBar.height
-            );
-
-            // border
-            ctx.strokeStyle = hpBar.borderColor;
-            ctx.lineWidth = 2;
-
-            ctx.strokeRect(
-                x,
-                hpBar.y,
-                hpBar.width,
-                hpBar.height
-            );
+            ctx.fillStyle = "red";
+            ctx.fillRect(canvas.width / 2 - 150, 20, 300, 20);
+            ctx.fillStyle = "lime";
+            ctx.fillRect(canvas.width / 2 - 150, 20, player.hp * 3, 20);
         }
 
         //////////////////////////
         // LOOP
         //////////////////////////
         function gameLoop() {
-
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
             updatePlayer();
-            if (
-                mouseDown &&
-                weapons[player.weapon].automatic
-            ) {
-                shoot();
-            }
             updateBullets();
             updateEnemies();
             checkCollisions();
-
-            regenerateHp();
-
             checkLevelEnd();
-
             let offset = getOffset();
-
             drawBackground(offset);
             drawWalls(offset);
             drawEnemies(offset);
             drawBullets(offset);
             drawPlayer();
             drawHP();
-            drawAmmo();
-
+            requestAnimationFrame(gameLoop);
             updateFade();
             drawFade();
-
-            requestAnimationFrame(gameLoop);
         }
+
         gameLoop();
     </script>
 
