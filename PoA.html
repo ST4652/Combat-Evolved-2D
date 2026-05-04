@@ -68,22 +68,22 @@
             dmr: {
                 damage: 2,
                 bulletSpeed: 14,
-                fireRate: 250, // ms medzi výstrelmi
-                spread: 0.03,
+                fireRate: 320, // ms medzi výstrelmi
+                spread: 0.08,
                 automatic: false,
-                reloadTime: 1800,
-                magSize: 10,
+                reloadTime: 1300,
+                magSize: 12,
                 color: "#ffd000"
             },
 
             ar: {
-                damage: 0.8,
+                damage: 90.8,               //0.8
                 bulletSpeed: 11,
-                fireRate: 135,
-                spread: 0.16,
+                fireRate: 140,              //140
+                spread: 0.19,             //0.16
                 automatic: true,
                 reloadTime: 2200,
-                magSize: 36,
+                magSize: 36,              //36
                 color: "#ff8800"
             }
         };
@@ -106,8 +106,8 @@
             lastHitTime: 0,
             lastHitTime: Date.now(),
 
-            weapon: "dmr",
-            ammo: 12,
+            weapon: "ar",
+            ammo: 16,
             reloading: false,
             lastShot: 0,
         };
@@ -322,6 +322,8 @@
 
         function shoot() {
 
+            if (dying) return;
+
             let weapon = weapons[player.weapon];
 
             if (player.reloading) return;
@@ -355,13 +357,13 @@
                 dx: Math.cos(angle) * weapon.bulletSpeed,
                 dy: Math.sin(angle) * weapon.bulletSpeed,
 
-                size: 5,
+                size: 10,
 
                 from: "player",
 
                 damage: weapon.damage,
 
-                life: 100
+                life: 80
             });
         }
 
@@ -413,47 +415,47 @@
         });
         document.addEventListener("keydown", e => {
 
-    if (e.key.toLowerCase() === "r") {
+            if (e.key.toLowerCase() === "r") {
 
-        reloadWeapon();
-    }
-});
+                reloadWeapon();
+            }
+        });
 
 
-////////////
-//hud
-//////////
-function drawAmmo() {
+        ////////////
+        //hud
+        //////////
+        function drawAmmo() {
 
-    let weapon = weapons[player.weapon];
+            let weapon = weapons[player.weapon];
 
-ctx.font = "32px 'Press Start 2P'";
-    ctx.textAlign = "right";
+            ctx.font = "32px 'Press Start 2P'";
+            ctx.textAlign = "right";
 
-    ctx.fillStyle = "white";
+            ctx.fillStyle = "white";
 
-    ctx.shadowColor = "black";
-    ctx.shadowBlur = 8;
+            ctx.shadowColor = "black";
+            ctx.shadowBlur = 8;
 
-    ctx.fillText(
-        `${player.ammo}/${weapon.magSize}`,
-        canvas.width - 40,
-        50
-    );
+            ctx.fillText(
+                `${player.ammo}/${weapon.magSize}`,
+                canvas.width - 40,
+                50
+            );
 
-    if (player.reloading) {
+            if (player.reloading) {
 
-        ctx.fillStyle = "#66ccff";
+                ctx.fillStyle = "#66ccff";
 
-        ctx.fillText(
-            "RELOADING",
-            canvas.width - 40,
-            90
-        );
-    }
+                ctx.fillText(
+                    "RELOADING",
+                    canvas.width - 40,
+                    90
+                );
+            }
 
-    ctx.shadowBlur = 0;
-}
+            ctx.shadowBlur = 0;
+        }
 
 
 
@@ -466,49 +468,210 @@ ctx.font = "32px 'Press Start 2P'";
         //////////////////////////
         let enemies = [
             //chodba medzi 1 a 2
-            { x: 1500, y: 800, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 1600, y: 850, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 1650, y: 900, type: "grunt", hp: 2, cooldown: 0 },
-            //druha miestnost
-            { x: 2800, y: 1350, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 2850, y: 1300, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 2100, y: 300, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 2200, y: 250, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 2150, y: 200, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 2850, y: 200, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 2880, y: 300, type: "elite", hp: 4, cooldown: 0 },
-            { x: 2800, y: 250, type: "elite", hp: 4, cooldown: 0 },
-            { x: 3400, y: -100, type: "elite", hp: 4, cooldown: 0 },
-            { x: 3350, y: -150, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 4050, y: -150, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 4500, y: -200, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 4600, y: -100, type: "elite", hp: 4, cooldown: 0 },
-            { x: 4625, y: 50, type: "elite", hp: 4, cooldown: 0 },
-            { x: 4625, y: 500, type: "elite", hp: 4, cooldown: 0 },
-            { x: 4625, y: 1500, type: "elite", hp: 4, cooldown: 0 },
-            { x: 4500, y: 1500, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 4050, y: 1250, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 4000, y: 1300, type: "elite", hp: 4, cooldown: 0 },
-            { x: 4100, y: 1300, type: "elite", hp: 4, cooldown: 0 },
-            { x: 4050, y: 1250, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 4050, y: 650, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 4100, y: 750, type: "grunt", hp: 2, cooldown: 0 },
+            { x: 1500, y: 800, type: "grunt", hp: 2, cooldown: 0 , section: 1 },
+            { x: 1600, y: 850, type: "grunt", hp: 2, cooldown: 0 , section:1 },
+            { x: 1650, y: 900, type: "grunt", hp: 2, cooldown: 0 , section: 1 },
+            //druha miestnost a choodba
+            { x: 2800, y: 1350, type: "grunt", hp: 2, cooldown: 0 , section: 2 },
+            { x: 2850, y: 1300, type: "grunt", hp: 2, cooldown: 0 , section: 2 },
+            { x: 2100, y: 300, type: "grunt", hp: 2, cooldown: 0 , section: 2 },
+            { x: 2200, y: 250, type: "grunt", hp: 2, cooldown: 0 , section: 2 },
+            { x: 2150, y: 200, type: "grunt", hp: 2, cooldown: 0 , section: 2 },
+            { x: 2850, y: 200, type: "grunt", hp: 2, cooldown: 0 , section: 2 },
+            { x: 2880, y: 300, type: "elite", hp: 4, cooldown: 0 , section: 2 },
+            { x: 2800, y: 250, type: "elite", hp: 4, cooldown: 0 , section: 2 },
+                { x: 3400, y: -100, type: "elite", hp: 4, cooldown: 0 , section: 2 },
+                { x: 3350, y: -150, type: "grunt", hp: 2, cooldown: 0 , section: 2}, 
+
+
+            { x: 4050, y: -150, type: "grunt", hp: 2, cooldown: 0 , section: 3},
+            { x: 4500, y: -200, type: "grunt", hp: 2, cooldown: 0 , section: 3},
+            { x: 4600, y: -100, type: "elite", hp: 4, cooldown: 0 , section: 3},
+            { x: 4625, y: 50, type: "elite", hp: 4, cooldown: 0 , section: 3},
+            { x: 4625, y: 500, type: "elite", hp: 4, cooldown: 0 , section: 3},
+            { x: 4625, y: 1500, type: "elite", hp: 4, cooldown: 0 , section: 3},
+            { x: 4500, y: 1500, type: "grunt", hp: 2, cooldown: 0 , section: 3},
+            { x: 4050, y: 1250, type: "grunt", hp: 2, cooldown: 0 , section: 3},
+            { x: 4000, y: 1300, type: "elite", hp: 4, cooldown: 0 , section:3},
+            { x: 4100, y: 1300, type: "elite", hp: 4, cooldown: 0 , section: 3},
+            { x: 4050, y: 1250, type: "grunt", hp: 2, cooldown: 0 , section: 3},
+            { x: 4050, y: 650, type: "grunt", hp: 2, cooldown: 0 , section: 3},
+            { x: 4100, y: 750, type: "grunt", hp: 2, cooldown: 0 , section: 3},
             //lifepody
-            { x: 4500, y: 2500, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 4550, y: 2550, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 4625, y: 2600, type: "elite", hp: 4, cooldown: 0 },
-            { x: 3830, y: 2550, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 3800, y: 2650, type: "elite", hp: 4, cooldown: 0 },
-            { x: 3750, y: 2600, type: "elite", hp: 4, cooldown: 0 },
-            { x: 3030, y: 2500, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 3000, y: 2650, type: "elite", hp: 4, cooldown: 0 },
-            { x: 2950, y: 2500, type: "elite", hp: 4, cooldown: 0 },
-            { x: 1330, y: 2100, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 1350, y: 2150, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 1250, y: 2100, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 1700, y: 2450, type: "elite", hp: 4, cooldown: 0 },
-            { x: 1750, y: 2500, type: "elite", hp: 4, cooldown: 0 },
+            { x: 4500, y: 2500, type: "grunt", hp: 2, cooldown: 0 , section: 4},
+            { x: 4550, y: 2550, type: "grunt", hp: 2, cooldown: 0 , section: 4},
+            { x: 4625, y: 2600, type: "elite", hp: 4, cooldown: 0 , section: 4},
+            { x: 3830, y: 2550, type: "grunt", hp: 2, cooldown: 0 , section: 4},
+            { x: 3800, y: 2650, type: "elite", hp: 4, cooldown: 0 , section: 4},
+            { x: 3750, y: 2600, type: "elite", hp: 4, cooldown: 0 , section: 4},
+            { x: 3030, y: 2500, type: "grunt", hp: 2, cooldown: 0 , section: 4},
+            { x: 3000, y: 2650, type: "elite", hp: 4, cooldown: 0 , section: 4},
+            { x: 2950, y: 2500, type: "elite", hp: 4, cooldown: 0 , section: 4},
+            { x: 1330, y: 2100, type: "grunt", hp: 2, cooldown: 0 , section: 4},
+            { x: 1350, y: 2150, type: "grunt", hp: 2, cooldown: 0 , section: 4},
+            { x: 1250, y: 2100, type: "grunt", hp: 2, cooldown: 0 , section: 4},
+            { x: 1700, y: 2450, type: "elite", hp: 4, cooldown: 0 , section: 4},
+            { x: 1750, y: 2500, type: "elite", hp: 4, cooldown: 0 , section: 4},
         ];
+        const originalEnemies = structuredClone(enemies);
+
+
+
+        //////////////////////////
+// CHECKPOINTY
+//////////////////////////
+
+let checkpoints = [
+
+    // checkpoint po prvej časti
+    {
+        x: 1400,
+        y: 850,
+
+        spawnX: 1480,
+        spawnY: 880,
+
+        section: 2,
+
+        activated: false
+    },
+
+    // checkpoint po druhej časti
+    {
+        x: 3230,
+        y: -150,
+
+        spawnX: 3230,
+        spawnY: -150,
+
+        section: 3,
+
+        activated: false
+    },
+
+        {
+        x: 4580,
+        y: 1470,
+
+        spawnX: 4580,
+        spawnY:1470,
+
+        section: 4,
+
+        activated: false
+    }
+];
+
+let currentCheckpoint = {
+    x: 500,
+    y: 500
+};
+
+let currentSection = 1;
+
+let dying = false;
+
+let deathFade = 0;
+
+
+
+/////
+
+
+
+
+function checkCheckpoints() {
+
+    checkpoints.forEach(cp => {
+
+        if (cp.activated) return;
+
+        let dist = Math.hypot(
+            player.x - cp.x,
+            player.y - cp.y
+        );
+
+        if (dist < 120) {
+
+            cp.activated = true;
+
+            currentCheckpoint.x = cp.spawnX;
+            currentCheckpoint.y = cp.spawnY;
+
+            currentSection = cp.section;
+
+            console.log("checkpoint activated");
+        }
+    });
+}
+
+
+
+//////
+
+
+
+function checkDeath() {
+
+    if (player.hp <= 0 && !dying) {
+
+        dying = true;
+    }
+}
+
+////////
+function respawnPlayer() {
+
+    player.x = currentCheckpoint.x;
+    player.y = currentCheckpoint.y;
+
+    player.hp = player.maxHp;
+
+    bullets = [];
+
+    // reset enemy
+    enemies = structuredClone(originalEnemies);
+
+    // odstráni staré sekcie
+    enemies = enemies.filter(e => e.section >= currentSection);
+
+    deathFade = 0;
+
+    dying = false;
+}
+
+/////
+
+
+function updateDeathFade() {
+
+    if (dying) {
+
+        deathFade += 0.01;
+
+        if (deathFade >= 1) {
+
+            respawnPlayer();
+        }
+    }
+}
+
+////
+function drawDeathFade() {
+
+    if (dying) {
+
+        ctx.fillStyle = `rgba(0,0,0,${deathFade})`;
+
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+}
+
+
+
+
+
+
 
 
         /////////////////
@@ -521,6 +684,7 @@ ctx.font = "32px 'Press Start 2P'";
         let fadeAlpha = 0;
 
 
+    
 
 
 
@@ -582,6 +746,7 @@ ctx.font = "32px 'Press Start 2P'";
         // UPDATE
         //////////////////////////
         function updatePlayer() {
+            if (dying) return;
             let newX = player.x;
             let newY = player.y;
             if (keys["w"]) newY -= player.speed;
@@ -888,6 +1053,12 @@ ctx.font = "32px 'Press Start 2P'";
 
             updateFade();
             drawFade();
+            drawDeathFade();
+
+            checkCheckpoints();
+
+            checkDeath();
+            updateDeathFade();
 
             requestAnimationFrame(gameLoop);
         }
