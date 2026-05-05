@@ -77,7 +77,7 @@
             },
 
             ar: {
-                damage: 90.8,               //0.8
+                damage: 0.8,               //0.8
                 bulletSpeed: 11,
                 fireRate: 140,              //140
                 spread: 0.19,             //0.16
@@ -107,7 +107,10 @@
             lastHitTime: Date.now(),
 
             weapon: "ar",
-            ammo: 16,
+            ammo: {
+                dmr: 12,
+                ar: 36
+                },
             reloading: false,
             lastShot: 0,
         };
@@ -328,7 +331,7 @@
 
             if (player.reloading) return;
 
-            if (player.ammo <= 0) {
+            if (player.ammo[player.weapon] <= 0) {
 
                 reloadWeapon();
                 return;
@@ -340,7 +343,7 @@
 
             player.lastShot = now;
 
-            player.ammo--;
+            player.ammo[player.weapon]--;
 
             let angle = Math.atan2(
                 mouse.y - canvas.height / 2,
@@ -383,7 +386,8 @@
 
             setTimeout(() => {
 
-                player.ammo = weapons[player.weapon].magSize;
+               player.ammo[player.weapon] =
+    weapons[player.weapon].magSize;
 
                 player.reloading = false;
 
@@ -403,14 +407,12 @@
 
                 player.weapon = "dmr";
 
-                player.ammo = weapons.dmr.magSize;
             }
 
             if (e.key === "ľ") {
 
                 player.weapon = "ar";
 
-                player.ammo = weapons.ar.magSize;
             }
         });
         document.addEventListener("keydown", e => {
@@ -425,37 +427,37 @@
         ////////////
         //hud
         //////////
-        function drawAmmo() {
+    function drawAmmo() {
 
-            let weapon = weapons[player.weapon];
+    let weapon = weapons[player.weapon];
 
-            ctx.font = "32px 'Press Start 2P'";
-            ctx.textAlign = "right";
+    ctx.font = "32px 'Press Start 2P'";
+    ctx.textAlign = "right";
 
-            ctx.fillStyle = "white";
+    ctx.fillStyle = "white";
 
-            ctx.shadowColor = "black";
-            ctx.shadowBlur = 8;
+    ctx.shadowColor = "black";
+    ctx.shadowBlur = 8;
 
-            ctx.fillText(
-                `${player.ammo}/${weapon.magSize}`,
-                canvas.width - 40,
-                50
-            );
+    ctx.fillText(
+        `${player.ammo[player.weapon]}/${weapon.magSize}`,
+        canvas.width - 40,
+        50
+    );
 
-            if (player.reloading) {
+    if (player.reloading) {
 
-                ctx.fillStyle = "#66ccff";
+        ctx.fillStyle = "#66ccff";
 
-                ctx.fillText(
-                    "RELOADING",
-                    canvas.width - 40,
-                    90
-                );
-            }
+        ctx.fillText(
+            "RELOADING",
+            canvas.width - 40,
+            90
+        );
+    }
 
-            ctx.shadowBlur = 0;
-        }
+    ctx.shadowBlur = 0;
+}
 
 
 
@@ -533,7 +535,10 @@ let checkpoints = [
 
         section: 2,
 
-        activated: false
+        requiredSection: 1,
+
+        activated: false,
+
     },
 
     // checkpoint po druhej časti
@@ -546,6 +551,8 @@ let checkpoints = [
 
         section: 3,
 
+        requiredSection: 2,
+
         activated: false
     },
 
@@ -557,6 +564,8 @@ let checkpoints = [
         spawnY:1470,
 
         section: 4,
+
+        requiredSection: 3,
 
         activated: false
     }
@@ -592,6 +601,11 @@ function checkCheckpoints() {
         );
 
         if (dist < 120) {
+            let enemiesLeft = enemies.some(
+    e => e.section === cp.requiredSection
+);
+
+if (enemiesLeft) return;
 
             cp.activated = true;
 
