@@ -36,10 +36,10 @@
         // TEXTÚRY
         //////////////////////////
         const dmrPlayerImg = new Image();
-        dmrPlayerImg.src = "masta chif dmr.png";
+        dmrPlayerImg.src = "biczkel.jpg";
 
         const arPlayerImg = new Image();
-        arPlayerImg.src = "masta chir ar.png";
+        arPlayerImg.src = "blood v3.png";
 
         const gruntImg = new Image();
         gruntImg.src = "grunt 16x16 v2.png";
@@ -536,9 +536,9 @@
         /////////
         //krv a dead body
         /////////
-     let corpses = [];
+        let corpses = [];
         let bloods = [];
-   
+
 
 
         const bloodImg = new Image();
@@ -624,7 +624,8 @@
         /////
 
 
-
+        let checkpointMsg = "";
+        let checkpointMsgTime = 0;
 
         function checkCheckpoints() {
 
@@ -647,12 +648,29 @@
 
                     currentSection = cp.section;
 
-                    console.log("checkpoint activated");
+                    checkpointMsg = "Checkpoint done...";
+                    checkpointMsgTime = Date.now();
                 }
             });
         }
 
+        //
 
+        function drawCheckpointText() {
+
+            if (Date.now() - checkpointMsgTime < 2000) {
+
+                ctx.font = "20px 'Press Start 2P'";
+                ctx.fillStyle = "white";
+                ctx.textAlign = "left";
+
+                ctx.fillText(
+                    checkpointMsg,
+                    30,
+                    canvas.height - 40
+                );
+            }
+        }
 
         //////
 
@@ -681,6 +699,9 @@
 
             // odstráni staré sekcie
             enemies = enemies.filter(e => e.section >= currentSection);
+
+            corpses = [];
+            bloods = [];
 
             deathFade = 0;
 
@@ -841,6 +862,12 @@
 
             enemies.forEach(e => {
 
+                if (!e.agro) e.agro = 0;
+
+                if (e.agro > 0) {
+                    e.agro--;
+                }
+
                 let dx = player.x - e.x;
                 let dy = player.y - e.y;
 
@@ -873,7 +900,7 @@
 
                 dist = Math.sqrt(dx * dx + dy * dy);
 
-                if (dist < activateDist + 200) {
+                if (dist < activateDist + 200 || e.agro > 0) {
 
                     e.angle = Math.atan2(dy, dx);
 
@@ -1017,6 +1044,11 @@
                         b.y + 5 > e.y
                     ) {
                         e.hp -= b.damage;
+
+                        e.lastPlayerX = player.x;
+                        e.lastPlayerY = player.y;
+
+                        e.agro = 600;
                         bloods.push({
 
                             x: b.x,
@@ -1322,6 +1354,8 @@
 
             checkDeath();
             updateDeathFade();
+
+            drawCheckpointText();
 
             requestAnimationFrame(gameLoop);
         }
