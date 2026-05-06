@@ -101,7 +101,7 @@
             speed: 2.0,     //2.0 dat potom
             angle: 0,
 
-            hp: 70,
+            hp: 70,        //70 obidve
             maxHp: 70,
             lastHitTime: 0,
             lastHitTime: Date.now(),
@@ -133,21 +133,21 @@
 
             y: 30
         };
-///////////
-//fps/rychlosr oprava
-///////////
-let lastTime = 0;
+        ///////////
+        //fps/rychlosr oprava
+        ///////////
+        let lastTime = 0;
 
-function gameLoop(timestamp) {
+        function gameLoop(timestamp) {
 
-    let delta = (timestamp - lastTime) / 16.67;
+            let delta = (timestamp - lastTime) / 16.67;
 
-    lastTime = timestamp;
+            lastTime = timestamp;
 
-    updatePlayer(delta);
+            updatePlayer(delta);
 
-    requestAnimationFrame(gameLoop);
-}
+            requestAnimationFrame(gameLoop);
+        }
 
 
 
@@ -533,6 +533,27 @@ function gameLoop(timestamp) {
         ];
         const originalEnemies = structuredClone(enemies);
 
+        /////////
+        //krv a dead body
+        /////////
+     let corpses = [];
+        let bloods = [];
+   
+
+
+        const bloodImg = new Image();
+        bloodImg.src = "blood v3.png";   //v3 asi nejlepsie
+
+        const gruntDeadImg = new Image();
+        gruntDeadImg.src = "grunt dead 16x16.png";
+
+        const eliteDeadImg = new Image();
+        eliteDeadImg.src = "elite blue dead 16x16.png";
+
+
+
+
+
 
 
         //////////////////////////
@@ -894,30 +915,52 @@ function gameLoop(timestamp) {
                     let newY = e.y + moveY;
 
                     // normálny pohyb
-                    if (!collideWithWalls(newX, e.y, 30)) {
+                    if (!collideWithWalls(newX, newY, 30)) {
 
                         e.x = newX;
-                    }
-
-                    // ak narazí do steny → skúsi iný smer
-                    else {
-
-                        if (!collideWithWalls(e.x, e.y + moveY, 30)) {
-
-                            e.y += moveY;
-                        }
-                    }
-
-                    if (!collideWithWalls(e.x, newY, 30)) {
-
                         e.y = newY;
                     }
 
+                    // ak narazí do steny
                     else {
 
-                        if (!collideWithWalls(e.x + moveX, e.y, 30)) {
+                        // skúsi X samostatne
+                        if (!collideWithWalls(newX, e.y, 30)) {
 
-                            e.x += moveX;
+                            e.x = newX;
+                        }
+
+                        // skúsi Y samostatne
+                        else if (!collideWithWalls(e.x, newY, 30)) {
+
+                            e.y = newY;
+                        }
+
+                        // ak stále nevie ísť → skúsi obísť stenu
+                        else {
+
+                            let sideX = -dy / dist;
+                            let sideY = dx / dist;
+
+                            let try1X = e.x + sideX * speed;
+                            let try1Y = e.y + sideY * speed;
+
+                            let try2X = e.x - sideX * speed;
+                            let try2Y = e.y - sideY * speed;
+
+                            // jedna strana
+                            if (!collideWithWalls(try1X, try1Y, 30)) {
+
+                                e.x = try1X;
+                                e.y = try1Y;
+                            }
+
+                            // druhá strana
+                            else if (!collideWithWalls(try2X, try2Y, 30)) {
+
+                                e.x = try2X;
+                                e.y = try2Y;
+                            }
                         }
                     }
 
@@ -974,12 +1017,100 @@ function gameLoop(timestamp) {
                         b.y + 5 > e.y
                     ) {
                         e.hp -= b.damage;
+                        bloods.push({
+
+                            x: b.x,
+                            y: b.y,
+
+                            size: 48 + Math.random() * 10,
+
+                            alpha: 1
+                        });
                         bullets.splice(i, 1);
-                        if (e.hp <= 0) enemies.splice(j, 1);
+                        if (e.hp <= 0) {
+
+                            corpses.push({
+
+                                x: e.x,
+                                y: e.y,
+
+                                angle: e.angle,
+
+                                type: e.type
+                            });
+
+                            bloods.push({
+
+                                x: e.x,
+                                y: e.y,
+
+                                size: 60,
+
+                                alpha: 1
+                            });
+
+                            enemies.splice(j, 1);
+                        }
                     }
                 });
             });
         }
+        //////////////////////////
+        // draw krv a mrtvoly
+        //////////////////////////
+        function drawBlood(offset) {
+
+            bloods.forEach(b => {
+
+                ctx.save();
+
+                ctx.globalAlpha = b.alpha;
+
+                ctx.drawImage(
+                    bloodImg,
+                    b.x - b.size / 2 - offset.x,
+                    b.y - b.size / 2 - offset.y,
+                    b.size,
+                    b.size
+                );
+
+                ctx.restore();
+            });
+        }
+
+        function drawCorpses(offset) {
+
+            corpses.forEach(c => {
+
+                let img =
+                    c.type === "grunt"
+                        ? gruntDeadImg
+                        : eliteDeadImg;
+
+                ctx.save();
+
+                ctx.translate(
+                    c.x - offset.x,
+                    c.y - offset.y
+                );
+
+                ctx.rotate(c.angle);
+
+                ctx.drawImage(
+                    img,
+                    -36,
+                    -36,
+                    72,
+                    72
+                );
+
+                ctx.restore();
+            });
+        }
+
+
+
+
 
         //////////////////////////
         // KAMERA
@@ -1175,6 +1306,8 @@ function gameLoop(timestamp) {
 
             drawBackground(offset);
             drawWalls(offset);
+            drawCorpses(offset);
+            drawBlood(offset);
             drawEnemies(offset);
             drawBullets(offset);
             drawPlayer();
