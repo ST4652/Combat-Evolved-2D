@@ -41,8 +41,14 @@
         let walls = [
 
             // cliff edge
-            { x: 0, y: -600, w: 4000, h: 600, texture: "rock" },//vrch velke
-            { x: -1000, y: -600, w: 1000, h: 2000, texture: "rock" },//lave velke
+            { x: 0, y: -600, w: 1280, h: 600, texture: "rock" },//vrch velke
+            { x: 1280, y: -600, w: 1280, h: 680, texture: "rock" },
+            { x: 2560, y: -600, w: 1280, h: 680, texture: "rock" },
+
+
+            { x: -1000, y: -600, w: 1000, h: 1280, texture: "rock" },//lave velke
+            { x: -1000, y: 680, w: 1000, h: 1280, texture: "rock" },
+
 
             { x: 0, y: 0, w: 800, h: 40, texture: "rock" },//prvy riadok od vrchu zlavej strany
             { x: 0, y: 40, w: 680, h: 40, texture: "rock" },
@@ -64,7 +70,7 @@
             { x: 0, y: 1000, w: 640, h: 40, texture: "rock" },
             { x: 0, y: 1040, w: 840, h: 40, texture: "rock" },
             { x: 0, y: 1080, w: 2280, h: 40, texture: "rock" },
-            { x: 1040, y: 1000, w: 1200, h: 80, texture: "rock" },//spodny napravo
+            { x: 1040, y: 1000, w: 1200, h: 120, texture: "rock" },//spodny napravo
             { x: 1000, y: 920, w: 1200, h: 80, texture: "rock" },
             { x: 920, y: 840, w: 1240, h: 80, texture: "rock" },
             { x: 960, y: 800, w: 1200, h: 40, texture: "rock" },//od spodu prvy co zacina zas napravo
@@ -366,34 +372,33 @@
 
             walls.forEach(w => {
 
-                let img = rockTile;
-
-
-                //steny stena textura
-                if (w.texture === "rock") {
-                    img = rockTile;
+                // mimo obrazovky
+                if (
+                    w.x + w.w < offset.x ||
+                    w.x > offset.x + canvas.width ||
+                    w.y + w.h < offset.y ||
+                    w.y > offset.y + canvas.height
+                ) {
+                    return;
                 }
 
-                if (w.texture === "most") {
-                    img = mostTile;
-                }
+                let img = rockBigTile;
 
-                // opakovanie textúry
-                for (let tx = 0; tx < w.w; tx += TILE_SIZE) {
+                ctx.drawImage(
 
-                    for (let ty = 0; ty < w.h; ty += TILE_SIZE) {
+                    img,
 
-                        ctx.drawImage(
-                            img,
+                    0,
+                    0,
+                    w.w,
+                    w.h,
 
-                            w.x + tx - offset.x,
-                            w.y + ty - offset.y,
+                    Math.round(w.x - offset.x),
+                    Math.round(w.y - offset.y),
 
-                            TILE_SIZE,
-                            TILE_SIZE
-                        );
-                    }
-                }
+                    w.w,
+                    w.h
+                );
             });
         }
 

@@ -31,6 +31,15 @@ rockTile.src = "kamen v3.png";    //v3 finalny alebo v7
 
 
 
+const rockBigTile = new Image();
+rockBigTile.src = "kamen 1280x1280.png";
+
+const grassBig = new Image();
+grassBig.src = "trava 2400x2400.png";
+
+
+
+
 const TILE_SIZE = 40;
 
 
