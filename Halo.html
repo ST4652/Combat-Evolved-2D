@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>PoA Level</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
     <style>
         body {
@@ -31,243 +32,166 @@
 
         ctx.imageSmoothingEnabled = false;
 
-        //////////////////////////
-        // TEXTÚRY
-        //////////////////////////
-        const playerImg = new Image();
-        playerImg.src = "masta chief 16x16 v2.png";
+        ///////////////////
+        // WALLS
+        //////////////////
 
-        const gruntImg = new Image();
-        gruntImg.src = "grunt 16x16 v2.png";
 
-        const eliteImg = new Image();
-        eliteImg.src = "elite blue 16x16 v2.png";
 
-        //////////////////////////
-        // HRÁČ
-        //////////////////////////
-        let player = {
-            x: 500,        //500 obidve
-            y: 500,
-            size: 80,
-            speed: 10.0,     //2.0 dat potom
-            angle: 0,
-            hp: 100
-        };
+        let walls = [
 
-        // STENY
+            // cliff edge
+            { x: 40, y: 0, w: 40, h: 40, texture: "rock" },
+            { x: 80, y: 40, w: 40, h: 40, texture: "rock" },
+            { x: 120, y: 80, w: 160, h: 120, texture: "rock" },
 
-let walls = [
-
-//prva miestnost
-    {x: 100, y: 150, w: 800, h: 20},//horna stena
-    {x: 100, y: 790, w: 800, h: 20},//dolna stena
-    {x: 100, y: 150, w: 20, h: 660},//lava stena
-        {x: 880, y: 150, w: 20, h: 230},//prava horna
-        {x: 880, y: 580, w: 20, h: 230},//prava dolna
-            {x: 400, y: 360, w: 200, h: 20},// ta vec horna
-               {x: 555, y: 210, w: -110, h: 110},// ta vec hornejsia 
-            {x: 400, y: 580, w: 200, h: 20},// ta vec dolna
-                {x: 555, y: 640, w: -110, h: 110},// ta vec hornejsia 
-
-    //   chodba medzi 1 a 2 miestnostami
-    {x: 880, y: 360, w: 700, h: 20}, //chodba horna stena
-    {x: 880, y: 580, w: 500, h: 20}, //chodba dolna stena
-
-    {x: 1560, y: 370, w: 20, h: 420},// prava strana S
-    {x: 1360, y: 580, w: 20, h: 420},// lava strana S
-    // po S
-    {x: 1560, y: 780, w: 650, h: 20}, //chodba horna stenadw
-    {x: 1360, y: 980, w: 700, h: 20}, //chodba dolna stena
-//druha miestnost
-    {x: 2040, y: 980, w: 20, h: 500},//lava dolu
-    {x: 2040, y: 150, w: 20, h: 650},//lava horna
-    {x: 2040, y: 1460, w: 900, h: 20},//dolna
-    {x: 2920, y: -50, w: 20, h: 1530},//prava
-    {x: 2040, y: 150, w: 680, h: 20},//horna
-        //kadejake veci
-                        {x: 2040, y: 550, w: 150, h: 150},
-                        {x: 2040, y: 350, w: 150, h: 150},
-                  
-                    {x: 2410, y: 780, w: 520, h: 20},
-                    
+        ];
 
 
 
 
-    //chodba medzi 2 a 3 miestnostami
-    {x: 2700, y: -270, w: 20, h: 540},//lava stena
-    {x: 2700, y: -270, w: 2000, h: 20},//horna
-    {x: 2920, y: -50, w: 1000, h: 20},//dolna
-    {x: 3900, y: -50, w: 20, h: 440},//prava stena
-//tretia miestnost
-    {x: 3900, y: -50, w: 20, h: 1530},//lava
-    {x: 3900, y: 1460, w: 580, h: 20},//dolna
-    {x: 4680, y: -270, w: 20, h: 3000},//prava
-        //vnutri kadeco
-            {x: 4100, y: 200, w: 400, h:20},
-            {x: 4100, y: 820, w: 400, h:20},
-            {x: 4312, y: 200, w: -10, h:620},
-                {x: 4250, y: 270, w: -100, h:100},
-                {x: 4470, y: 270, w: -100, h:100},
-                {x: 4250, y: 470, w: -100, h:100},
-                {x: 4470, y: 470, w: -100, h:100},
-                {x: 4250, y: 670, w: -100, h:100},
-                {x: 4470, y: 670, w: -100, h:100},
-                {x: 4100, y: 1000, w: 400, h:20},
-
-                {x: 3970, y: 1340, w: 100, h: 100},
-                {x: 4130, y: 1340, w: 100, h: 100},
-                {x: 4290, y: 1340, w: 100, h: 100},
-
-
-//chodba z tretej kolo lifepodov
-    {x: 4460, y: 1460, w: 20, h: 540},//lava od miestnosti 3
-    {x: 1080, y: 1980, w: 3400, h: 20},//horna
-    {x: 1080, y: 1980, w: 20, h: 240},//lava
-    {x: 1080, y: 2200, w: 600, h: 20},//nalavo od lifepodov
-    //medzi lp
-        {x: 3880, y: 2200, w: 600, h: 20},//3 a 4
-        {x: 3080, y: 2200, w: 600, h: 20},//2 a 3
-        {x: 1880, y: 2200, w: 1000, h: 20},//1 a 2
-        //lp4
-            {x: 4460, y: 2200, w: 20, h: 530},//lava lp
-            {x: 4460, y: 2710, w: 240, h: 20},//spod lp
-        //lp3
-            {x: 3660, y: 2200, w: 20, h: 530},//lava lp
-            {x: 3660, y: 2710, w: 240, h: 20},//spod lp
-            {x: 3880, y: 2200, w: 20, h: 530},//prava lp
-        //lp2
-            {x: 2860, y: 2200, w: 20, h: 530},//lava lp
-            {x: 2860, y: 2710, w: 240, h: 20},//spod lp
-            {x: 3080, y: 2200, w: 20, h: 530},//prava lp
-        //lp1   finalne
-            {x: 1660, y: 2200, w: 20, h: 730},//lava lp
-            {x: 1660, y: 2910, w: 240, h: -200},//spod lp
-            {x: 1660, y: 2900, w: 240, h: 350},//spod lp
-            {x: 1880, y: 2200, w: 20, h: 730},//prava lp
-
-];
-
-
-
-
-
-        // Podlahové oblasti - presne zarovnané so stenami (bez medzier)
         let floors = [
-            // prva miestnost - celá vnútorná plocha
-            { x: 120, y: 170, w: 760, h: 620 },
-            // chodba hore (medzi 1 a 2) - horizontálna
-            { x: 880, y: 380, w: 680, h: 200 },
-            // S-zatacka - zvislá časť
-            { x: 1380, y: 380, w: 180, h: 600 },
-            // chodba dole (po S-zatacke)
-            { x: 1380, y: 800, w: 700, h: 180 },
-            // druha miestnost
-            { x: 2060, y: 170, w: 860, h: 1290 },
-            // chodba medzi 2 a 3
-            { x: 2720, y: -250, w: 1200, h: 200 },
-            { x: 2720, y: -250, w: 200, h: 420 },
-            // tretia miestnost
-            { x: 3920, y: -270, w: 760, h: 1730 },
-            {x: 4460, y: 1460, w: 220, h: 1270},
-            // dlha chodba (lifepody) - horizontálna
-            { x: 1100, y: 2000, w: 3380, h: 200 },
-            // lifepod sekcia
-            {x: 4460, y: 2200, w: 20, h: 530},//lava lp
-            {x: 3660, y: 2200, w: 220, h: 530},//lava lp
-            {x: 2860, y: 2200, w: 220, h: 530},//lava lp
-            {x: 1660, y: 2200, w: 220, h: 530},//lava lp
-
+            { x: 0, y: 0, w: 4000, h: 2000 },
 
 
         ];
 
-        //////////////////////////
-        // OVLÁDANIE
-        //////////////////////////
-        let keys = {};
-        document.addEventListener("keydown", e => keys[e.key] = true);
-        document.addEventListener("keyup", e => keys[e.key] = false);
 
-        let mouse = { x: 0, y: 0 };
-        canvas.addEventListener("mousemove", e => {
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
-        });
 
-        //////////////////////////
-        // STRELY
-        //////////////////////////
-        let bullets = [];
-
-        canvas.addEventListener("click", () => {
-            let angle = Math.atan2(mouse.y - canvas.height / 2, mouse.x - canvas.width / 2);
-            bullets.push({
-                x: player.x,
-                y: player.y,
-                dx: Math.cos(angle) * 8,
-                dy: Math.sin(angle) * 8,
-                size: 5,
-                from: "player"
-            });
-        });
 
         //////////////////////////
         // ENEMY
         //////////////////////////
         let enemies = [
             //chodba medzi 1 a 2
-            { x: 1500, y: 800, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 1600, y: 850, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 1650, y: 900, type: "grunt", hp: 2, cooldown: 0 },
-            //druha miestnost
-            { x: 2800, y: 1350, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 2850, y: 1300, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 2100, y: 300, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 2200, y: 250, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 2150, y: 200, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 2850, y: 200, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 2880, y: 300, type: "elite", hp: 4, cooldown: 0 },
-            { x: 2800, y: 250, type: "elite", hp: 4, cooldown: 0 },
-            { x: 3400, y: -100, type: "elite", hp: 4, cooldown: 0 },
-            { x: 3350, y: -150, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 4050, y: -150, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 4500, y: -200, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 4600, y: -100, type: "elite", hp: 4, cooldown: 0 },
-            { x: 4625, y: 50, type: "elite", hp: 4, cooldown: 0 },
-            { x: 4625, y: 500, type: "elite", hp: 4, cooldown: 0 },
-            { x: 4625, y: 1500, type: "elite", hp: 4, cooldown: 0 },
-            { x: 4500, y: 1500, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 4050, y: 1250, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 4000, y: 1300, type: "elite", hp: 4, cooldown: 0 },
-            { x: 4100, y: 1300, type: "elite", hp: 4, cooldown: 0 },
-            { x: 4050, y: 1250, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 4050, y: 650, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 4100, y: 750, type: "grunt", hp: 2, cooldown: 0 },
-            //lifepody
-            { x: 4500, y: 2500, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 4550, y: 2550, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 4625, y: 2600, type: "elite", hp: 4, cooldown: 0 },
-            { x: 3830, y: 2550, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 3800, y: 2650, type: "elite", hp: 4, cooldown: 0 },
-            { x: 3750, y: 2600, type: "elite", hp: 4, cooldown: 0 },
-            { x: 3030, y: 2500, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 3000, y: 2650, type: "elite", hp: 4, cooldown: 0 },
-            { x: 2950, y: 2500, type: "elite", hp: 4, cooldown: 0 },
-            { x: 1330, y: 2100, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 1350, y: 2150, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 1250, y: 2100, type: "grunt", hp: 2, cooldown: 0 },
-            { x: 1700, y: 2450, type: "elite", hp: 4, cooldown: 0 },
-            { x: 1750, y: 2500, type: "elite", hp: 4, cooldown: 0 },
+      //      { x: 150, y: 10, type: "grunt", hp: 2, cooldown: 0, section: 1 },
+        //    { x: 170, y: 10, type: "elite", hp: 4, cooldown: 0, section: 1 },
         ];
+        const originalEnemies = structuredClone(enemies);
+
+        /////////
+        //krv a dead body
+        /////////
+        let corpses = [];
+        let bloods = [];
+
+
+
+
+
+
+        //////////////////////////
+        // CHECKPOINTY
+        //////////////////////////
+
+        let checkpoints = [
+
+            // checkpoint po prvej časti
+            {
+                x: 1400,
+                y: 850,
+
+                spawnX: 1480,
+                spawnY: 880,
+
+                section: 2,
+
+                requiredSection: 1,
+
+                activated: false,
+
+            },
+
+            // checkpoint po druhej časti
+            {
+                x: 3230,
+                y: -150,
+
+                spawnX: 3230,
+                spawnY: -150,
+
+                section: 3,
+
+                requiredSection: 2,
+
+                activated: false
+            },
+
+            {
+                x: 4580,
+                y: 1470,
+
+                spawnX: 4580,
+                spawnY: 1470,
+
+                section: 4,
+
+                requiredSection: 3,
+
+                activated: false
+            }
+        ];
+
+        let currentCheckpoint = {
+            x: 500,
+            y: 500
+        };
+
+        let currentSection = 1;
+
+        let dying = false;
+
+        let deathFade = 0;
+
+
+
+        /////
+
+
+        let checkpointMsg = "";
+        let checkpointMsgTime = 0;
+
+        function checkCheckpoints() {
+
+            checkpoints.forEach(cp => {
+
+                if (cp.activated) return;
+
+                let dist = Math.hypot(
+                    player.x - cp.x,
+                    player.y - cp.y
+                );
+
+                if (dist < 120) {      //TOTO MENIT JAK TAK XXXXXXXXXXXXXXXXXX
+
+
+                    cp.activated = true;
+
+                    currentCheckpoint.x = cp.spawnX;
+                    currentCheckpoint.y = cp.spawnY;
+
+                    currentSection = cp.section;
+
+                    checkpointMsg = "Checkpoint done...";
+                    checkpointMsgTime = Date.now();
+                }
+            });
+        }
+
+        //
+
+
+
+
+
+
 
 
         /////////////////
         // exit
         /////////////
 
-        let exitZone = {x: 1460, y: 2710, w: 440, h: 200}
+        let exitZone = { x: 1460, y: 2710, w: 440, h: 200 }
 
         let fading = false;
         let fadeAlpha = 0;
@@ -276,186 +200,47 @@ let walls = [
 
 
 
-function checkLevelEnd() {
-
-    if (
-        player.x + player.size/2 > exitZone.x &&
-        player.x - player.size/2 < exitZone.x + exitZone.w &&
-        player.y + player.size/2 > exitZone.y &&
-        player.y - player.size/2 < exitZone.y + exitZone.h
-    ) {
-
-        // ďalší level
-        fading = true;
-    }
-}
-
-function updateFade() {
-
-    if (fading) {
-
-        fadeAlpha += 0.01;
-
-        if (fadeAlpha >= 1) {
-            window.location.href = "Halo.html";
-        }
-    }
-}
 
 
-
-
-function drawFade() {
-
-    ctx.fillStyle = `rgba(255,255,255,${fadeAlpha})`;
-
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-}
-        //////////////////////////
-        // KOLÍZIA
-        //////////////////////////
-        function collideRect(x, y, size, w) {
-            return (
-                x - size / 10 < w.x + w.w &&
-                x + size / 10 > w.x &&
-                y - size / 10 < w.y + w.h &&
-                y + size / 10 > w.y
-            );
-        }
-
-        function collideWithWalls(x, y, size) {
-            for (let w of walls) {
-                if (collideRect(x, y, size, w)) return true;
-            }
-            return false;
-        }
 
         //////////////////////////
-        // UPDATE
-        //////////////////////////
-        function updatePlayer() {
-            let newX = player.x;
-            let newY = player.y;
-            if (keys["w"]) newY -= player.speed;
-            if (keys["s"]) newY += player.speed;
-            if (keys["a"]) newX -= player.speed;
-            if (keys["d"]) newX += player.speed;
-            if (!collideWithWalls(newX, player.y, player.size)) player.x = newX;
-            if (!collideWithWalls(player.x, newY, player.size)) player.y = newY;
-            player.angle = Math.atan2(mouse.y - canvas.height / 2, mouse.x - canvas.width / 2);
-        }
-
-        function updateBullets() {
-            bullets.forEach((b, i) => {
-                b.x += b.dx;
-                b.y += b.dy;
-                for (let w of walls) {
-                    if (collideRect(b.x, b.y, b.size, w)) {
-                        bullets.splice(i, 1);
-                        return;
-                    }
-                }
-                if (b.from === "enemy") {
-                    if (
-                        b.x < player.x + player.size &&
-                        b.x + b.size > player.x &&
-                        b.y < player.y + player.size &&
-                        b.y + b.size > player.y
-                    ) {
-                        player.hp -= 5;
-                        bullets.splice(i, 1);
-                    }
-                }
-            });
-        }
-
-        function updateEnemies() {
-            enemies.forEach(e => {
-                let dx = player.x - e.x;
-                let dy = player.y - e.y;
-                let dist = Math.sqrt(dx * dx + dy * dy);
-                let speed = (e.type === "grunt") ? 1.1 : 1.3;
-                let activateDist = 620;
-                let stopDist = (e.type === "grunt") ? 130 : 150;
-                if (dist < activateDist) {
-                    e.angle = Math.atan2(dy, dx);
-                    let moveX = 0;
-                    let moveY = 0;
-                    if (dist > stopDist) {
-                        moveX = dx / dist * speed;
-                        moveY = dy / dist * speed;
-                    } else {
-                        let strafe = (Math.random() - 0.8) * 0.80;
-                        moveX = -dy / dist * strafe;
-                        moveY = dx / dist * strafe;
-                    }
-                    let newX = e.x + moveX;
-                    let newY = e.y + moveY;
-                    if (!collideWithWalls(newX, e.y, 30)) e.x = newX;
-                    if (!collideWithWalls(e.x, newY, 30)) e.y = newY;
-                    e.cooldown--;
-                    if (e.cooldown <= 0) {
-                        let angle = Math.atan2(dy, dx);
-                        bullets.push({
-                            x: e.x,
-                            y: e.y,
-                            dx: Math.cos(angle) * 5,
-                            dy: Math.sin(angle) * 5,
-                            size: 5,
-                            from: "enemy",
-                            enemyType: e.type
-                        });
-                        e.cooldown = (e.type === "grunt") ? 120 : 60;
-                    }
-                }
-            });
-        }
-
-        function checkCollisions() {
-            bullets.forEach((b, i) => {
-                enemies.forEach((e, j) => {
-                    if (
-                        b.from === "player" &&
-                        b.x < e.x + 30 &&
-                        b.x + 5 > e.x &&
-                        b.y < e.y + 30 &&
-                        b.y + 5 > e.y
-                    ) {
-                        e.hp--;
-                        bullets.splice(i, 1);
-                        if (e.hp <= 0) enemies.splice(j, 1);
-                    }
-                });
-            });
-        }
-
-        //////////////////////////
-        // KAMERA
-        //////////////////////////
-        function getOffset() {
-            return {
-                x: player.x - canvas.width / 2,
-                y: player.y - canvas.height / 2
-            };
-        }
-
-        //////////////////////////
-        // DRAW
+        // DRAW    aaaa
         //////////////////////////
         function drawBackground(offset) {
             // Vonkajšie pozadie
-            ctx.fillStyle = "#222222";
+            ctx.fillStyle = "#999999";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             const gridSize = 40;
 
             floors.forEach(f => {
                 // Podlaha
-                ctx.fillStyle = "#888888";
-                ctx.fillRect(f.x - offset.x, f.y - offset.y, f.w, f.h);
+                for (
+                    let tx = f.x;
+                    tx < f.x + f.w;
+                    tx += TILE_SIZE
+                ) {
+
+                    for (
+                        let ty = f.y;
+                        ty < f.y + f.h;
+                        ty += TILE_SIZE
+                    ) {
+
+ctx.drawImage(
+    grassTile,
+
+    Math.round(tx - offset.x),
+    Math.round(ty - offset.y),
+
+    TILE_SIZE,
+    TILE_SIZE
+);
+                    }
+                };
 
                 // Mriežka - clip na floor, globálne zarovnaná
-                ctx.save();
+              /*  ctx.save();
                 ctx.beginPath();
                 ctx.rect(f.x - offset.x, f.y - offset.y, f.w, f.h);
                 ctx.clip();
@@ -482,14 +267,36 @@ function drawFade() {
                     ctx.stroke();
                 }
 
-                ctx.restore();
+                ctx.restore();   */
             });
         }
 
         function drawWalls(offset) {
-            ctx.fillStyle = "#555";
+
             walls.forEach(w => {
-                ctx.fillRect(w.x - offset.x, w.y - offset.y, w.w, w.h);
+
+                let img = rockTile;
+
+                if (w.texture === "rock") {
+                    img = rockTile;
+                }
+
+                // opakovanie textúry
+                for (let tx = 0; tx < w.w; tx += TILE_SIZE) {
+
+                    for (let ty = 0; ty < w.h; ty += TILE_SIZE) {
+
+                        ctx.drawImage(
+                            img,
+
+                            w.x + tx - offset.x,
+                            w.y + ty - offset.y,
+
+                            TILE_SIZE,
+                            TILE_SIZE
+                        );
+                    }
+                }
             });
         }
 
@@ -542,42 +349,68 @@ function drawFade() {
             ctx.save();
             ctx.translate(canvas.width / 2, canvas.height / 2);
             ctx.rotate(player.angle);
-            ctx.drawImage(playerImg, -player.size / 2, -player.size / 2, player.size, player.size);
+            let currentImg =
+                player.weapon === "dmr"
+                    ? dmrPlayerImg
+                    : arPlayerImg;
+
+            ctx.drawImage(
+                currentImg,
+                -player.size / 2,
+                -player.size / 2,
+                player.size,
+                player.size
+            );
             ctx.restore();
         }
 
         function drawHP() {
-            ctx.fillStyle = "red";
-            ctx.fillRect(canvas.width / 2 - 150, 20, 300, 20);
-            ctx.fillStyle = "lime";
-            ctx.fillRect(canvas.width / 2 - 150, 20, player.hp * 3, 20);
+
+            let x = canvas.width / 2 - hpBar.width / 2;
+
+            // background
+            ctx.fillStyle = hpBar.backgroundColor;
+            ctx.fillRect(
+                x,
+                hpBar.y,
+                hpBar.width,
+                hpBar.height
+            );
+
+            // hp percent
+            let hpPercent = player.hp / player.maxHp;
+
+            // 🔥 clamp
+            if (hpPercent < 0) hpPercent = 0;
+
+            // actual hp
+            ctx.fillStyle = hpBar.hpColor;
+            ctx.fillRect(
+                x,
+                hpBar.y,
+                hpBar.width * hpPercent,
+                hpBar.height
+            );
+
+            // border
+            ctx.strokeStyle = hpBar.borderColor;
+            ctx.lineWidth = 2;
+
+            ctx.strokeRect(
+                x,
+                hpBar.y,
+                hpBar.width,
+                hpBar.height
+            );
         }
 
-        //////////////////////////
-        // LOOP
-        //////////////////////////
-        function gameLoop() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            updatePlayer();
-            updateBullets();
-            updateEnemies();
-            checkCollisions();
-            checkLevelEnd();
-            let offset = getOffset();
-            drawBackground(offset);
-            drawWalls(offset);
-            drawEnemies(offset);
-            drawBullets(offset);
-            drawPlayer();
-            drawHP();
-            requestAnimationFrame(gameLoop);
-            updateFade();
-            drawFade();
-        }
 
-        gameLoop();
     </script>
 
 </body>
 
 </html>
+
+
+
+<script src="engine.js"></script>
