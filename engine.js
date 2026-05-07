@@ -19,6 +19,9 @@ eliteImg.src = "elite blue 16x16 v2.png";
 const grassTile = new Image();
 grassTile.src = "trava v14.png";     //v14 final
 
+const mostTile = new Image();
+mostTile.src = "most v9.png";       //potom most v9.png
+
 const dirtTile = new Image();
 dirtTile.src = "elite red 16x16 v2.png"; 
 
@@ -26,7 +29,7 @@ const rockTile = new Image();
 rockTile.src = "kamen v3.png";    //v3 finalny alebo v7
 
 
-//potom most v9.png
+
 
 const TILE_SIZE = 40;
 
@@ -84,7 +87,7 @@ let weapons = {
 // OBTIAŽNOSŤ
 //////////////////////////
 
-let difficulty = "heroic";
+let difficulty = "normal";
 // "normal"
 // "heroic"
 
@@ -118,8 +121,8 @@ const difficulties = {
         enemyAccuracy: 0.10,
         enemyFireRate: 0.82,
         enemyActivateDist: 650,
-        regenDelay: 5000,
-        regenSpeed: 0.06,
+        regenDelay: 4000,
+        regenSpeed: 0.075,
         weaponDamageMultiplier: 0.92
     },
 
@@ -129,6 +132,17 @@ const difficulties = {
         enemyAccuracy: 0.05,
         enemyFireRate: 0.65,
         enemyActivateDist: 700,
+        regenDelay: 5500,
+        regenSpeed: 0.05,
+        weaponDamageMultiplier: 0.85
+    },
+
+        test: {
+        playerHp: 40,
+        enemySpeed: 1.45,
+        enemyAccuracy: 0.05,
+        enemyFireRate: 0.65,
+        enemyActivateDist: 0,
         regenDelay: 7000,
         regenSpeed: 0.03,
         weaponDamageMultiplier: 0.85
@@ -144,7 +158,7 @@ const diff = difficulties[difficulty];
 //////////////////////////
 
 let player = {
-    x: 500,        //500 obidve
+    x: 500,        //500 obidve      //naposledy na Halo 2600,1600
     y: 500,
     size: 80,
     speed: 2.0,     //2.0 dat potom
