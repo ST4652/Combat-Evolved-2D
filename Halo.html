@@ -39,9 +39,9 @@
 
 
 
-        
-        
-        
+
+
+
 
 
         let walls = [
@@ -155,21 +155,21 @@
         //////////////////////////
         let enemies = [
             //chodba medzi 1 a 2
-            { x: 2950, y: 900, type: "grunt", hp: 2, cooldown: 0, section: 1 },
-            { x: 2900, y: 980, type: "grunt", hp: 2, cooldown: 0, section: 1 },
-            { x: 3050, y: 940, type: "elite", hp: 4, cooldown: 0, section: 1 },
+            { x: 2950, y: 900, type: "grunt", rank: "minor", cooldown: 0, section: 1 },
+            { x: 2900, y: 980, type: "grunt", rank: "major", cooldown: 0, section: 1 },
+            { x: 3050, y: 940, type: "elite", rank: "minor", cooldown: 0, section: 1 },
 
 
-            { x: 2650, y: 1500, type: "grunt", hp: 2, cooldown: 0, section: 1 },
-            { x: 2550, y: 1560, type: "grunt", hp: 2, cooldown: 0, section: 1 },
-            { x: 2500, y: 1440, type: "elite", hp: 4, cooldown: 0, section: 1 },
-            { x: 2700, y: 1600, type: "elite", hp: 4, cooldown: 0, section: 1 },
-            { x: 2750, y: 1560, type: "grunt", hp: 2, cooldown: 0, section: 1 },
+            { x: 2650, y: 1500, type: "grunt", rank: "minor", cooldown: 0, section: 1 },
+            { x: 2550, y: 1560, type: "grunt", rank: "minor", cooldown: 0, section: 1 },
+            { x: 2500, y: 1440, type: "elite", rank: "minor", cooldown: 0, section: 1 },
+            { x: 2700, y: 1600, type: "elite", rank: "minor", cooldown: 0, section: 1 },
+            { x: 2750, y: 1560, type: "grunt", rank: "minor", cooldown: 0, section: 1 },
 
 
-            { x: 170, y: 10, type: "elite", hp: 4, cooldown: 0, section: 1 },
+            { x: 170, y: 10, type: "elite", rank: "minor", cooldown: 0, section: 1 },
         ];
-        const originalEnemies = structuredClone(enemies);
+       
 
         /////////
         //krv a dead body
@@ -331,14 +331,15 @@
                         let ty = f.y;
                         ty < f.y + f.h;
                         ty += BIG_TILE
-                    ) {if (
-    tx + BIG_TILE < offset.x ||
-    tx > offset.x + canvas.width ||
-    ty + BIG_TILE < offset.y ||
-    ty > offset.y + canvas.height
-) {
-    continue;
-}
+                    ) {
+                        if (
+                            tx + BIG_TILE < offset.x ||
+                            tx > offset.x + canvas.width ||
+                            ty + BIG_TILE < offset.y ||
+                            ty > offset.y + canvas.height
+                        ) {
+                            continue;
+                        }
 
                         // koľko sa reálne má vykresliť
                         let drawW = Math.min(
@@ -444,7 +445,33 @@
         function drawEnemies(offset) {
             let enemySize = 72;
             enemies.forEach(e => {
-                let img = (e.type === "grunt") ? gruntImg : eliteImg;
+                let img;
+
+                if (e.type === "grunt") {
+
+                    img =
+                        e.rank === "major"
+                            ? gruntMajorImg
+                            : gruntMinorImg;
+                }
+
+                else if (e.type === "elite") {
+
+                    if (e.rank === "minor") {
+
+                        img = eliteMinorImg;
+                    }
+
+                    else if (e.rank === "major") {
+
+                        img = eliteMajorImg;
+                    }
+
+                    else {
+
+                        img = eliteZealotImg;
+                    }
+                }
                 ctx.save();
                 ctx.translate(e.x - offset.x, e.y - offset.y);
                 ctx.rotate(e.angle);

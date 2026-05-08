@@ -1,3 +1,14 @@
+let difficulty =
+    localStorage.getItem("difficulty")
+    || "heroic";
+let gameSpeed = 1.4;    //1.4
+
+
+
+
+
+
+
 //////////////////////////
 // TEXTÚRY
 //////////////////////////
@@ -7,11 +18,20 @@ dmrPlayerImg.src = "masta chief dmr v2.png";
 const arPlayerImg = new Image();
 arPlayerImg.src = "masta chief ar v2.png";
 
-const gruntImg = new Image();
-gruntImg.src = "grunt 16x16 v2.png";
+const gruntMinorImg = new Image();
+gruntMinorImg.src = "grunt minor.png";
 
-const eliteImg = new Image();
-eliteImg.src = "elite blue 16x16 v2.png";
+const gruntMajorImg = new Image();
+gruntMajorImg.src = "grunt major.png";
+
+const eliteMinorImg = new Image();
+eliteMinorImg.src = "elite minor.png";
+
+const eliteMajorImg = new Image();
+eliteMajorImg.src = "elite major.png";
+
+const eliteZealotImg = new Image();
+eliteZealotImg.src = "elite zealot.png";
 
 
 
@@ -23,7 +43,7 @@ const mostTile = new Image();
 mostTile.src = "most v9.png";       //potom most v9.png
 
 const dirtTile = new Image();
-dirtTile.src = "elite red 16x16 v2.png"; 
+dirtTile.src = "elite red 16x16 v2.png";
 
 const rockTile = new Image();
 rockTile.src = "kamen v3.png";    //v3 finalny alebo v7
@@ -103,9 +123,8 @@ let weapons = {
 // OBTIAŽNOSŤ
 //////////////////////////
 
-let difficulty = "normal";
-// "normal"
-// "heroic"
+
+
 
 const difficulties = {
 
@@ -153,7 +172,7 @@ const difficulties = {
         weaponDamageMultiplier: 0.85
     },
 
-        test: {
+    test: {
         playerHp: 40,
         enemySpeed: 1.45,
         enemyAccuracy: 0.05,
@@ -161,12 +180,89 @@ const difficulties = {
         enemyActivateDist: 0,
         regenDelay: 7000,
         regenSpeed: 0.03,
-        weaponDamageMultiplier: 0.85
+        weaponDamageMultiplier: 67,
+    }
+};
+const diff = difficulties[difficulty];
+
+
+
+
+
+const enemyRanks = {
+
+    grunt: {
+
+        minor: {
+            hp: 1.7,
+            speed: 1.0,
+            accuracy: 0.22,
+            fireRate: 1.0,
+
+            bulletSpeed: 5,
+
+            texture: "minor",
+        },
+
+        major: {
+            hp: 3,
+            speed: 1.18,
+            accuracy: 0.14,
+            fireRate: 0.82,
+
+            bulletSpeed: 5.8,
+
+            texture: "major",
+        }
+    },
+
+    elite: {
+
+        minor: {
+            hp: 4,
+            speed: 1.15,
+            accuracy: 0.12,
+            fireRate: 0.72,
+
+            bulletSpeed: 6,
+
+            texture: "minor",
+        },
+
+        major: {
+            hp: 6,
+            speed: 1.32,
+            accuracy: 0.08,
+            fireRate: 0.58,
+
+            bulletSpeed: 6.5,
+
+            texture: "major",
+        },
+
+        zealot: {
+            hp: 8,
+            speed: 1.45,
+            accuracy: 0.035,
+            fireRate: 0.42,
+
+            bulletSpeed: 7.2,
+
+            texture: "zealot",
+        }
     }
 };
 
-const diff = difficulties[difficulty];
 
+
+ const originalEnemies = structuredClone(enemies);
+        enemies.forEach(e => {
+
+            const rankData =
+                enemyRanks[e.type][e.rank];
+
+            e.hp = rankData.hp;
+        });
 
 
 //////////////////////////
@@ -215,23 +311,70 @@ const hpBar = {
 ///////////
 //fps/rychlosr oprava
 ///////////
+
+
 let lastTime = 0;
 
 function gameLoop(timestamp) {
 
-    let delta = (timestamp - lastTime) / 166.67;
+    let delta = (timestamp - lastTime) / 16.67;
+
     lastTime = timestamp;
 
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+    if (delta > 2) delta = 2;
+
+    delta *= gameSpeed;
+
+    lastTime = timestamp;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     updatePlayer(delta);
+
+    if (
+        mouseDown &&
+        weapons[player.weapon].automatic
+    ) {
+        shoot();
+    }
+
     updateBullets(delta);
+
     updateEnemies(delta);
 
+    checkCollisions();
 
+    regenerateHp();
+
+    checkLevelEnd();
+
+    let offset = getOffset();
+
+    drawBackground(offset);
+    drawWalls(offset);
+    drawCorpses(offset);
+    drawBlood(offset);
+    drawEnemies(offset);
+    drawBullets(offset);
+    drawPlayer();
+    drawHP();
+    drawAmmo();
+
+    updateFade();
+    drawFade();
+    drawDeathFade();
+
+    checkCheckpoints();
+
+    checkDeath();
+    updateDeathFade();
+
+    drawCheckpointText();
 
     requestAnimationFrame(gameLoop);
 }
+
+requestAnimationFrame(gameLoop);
 
 
 
@@ -436,13 +579,22 @@ function drawAmmo() {
 
 
 const bloodImg = new Image();
-bloodImg.src = "blood v3.png";   //v3 asi nejlepsie
+bloodImg.src = "blood v3.png";        //v3 asi nejlepsie
 
-const gruntDeadImg = new Image();
-gruntDeadImg.src = "grunt dead 16x16.png";
+const gruntMinorDeadImg = new Image();
+gruntMinorDeadImg.src = "grunt minor dead.png";
 
-const eliteDeadImg = new Image();
-eliteDeadImg.src = "elite blue dead 16x16.png";
+const gruntMajorDeadImg = new Image();
+gruntMajorDeadImg.src = "grunt major dead.png";
+
+const eliteMinorDeadImg = new Image();
+eliteMinorDeadImg.src = "elite minor dead.png";
+
+const eliteMajorDeadImg = new Image();
+eliteMajorDeadImg.src = "elite major dead.png";
+
+const eliteZealotDeadImg = new Image();
+eliteZealotDeadImg.src = "elite zealot dead.png";
 
 
 
@@ -487,6 +639,13 @@ function respawnPlayer() {
 
     // reset enemy
     enemies = structuredClone(originalEnemies);
+    enemies.forEach(e => {
+
+        const rankData =
+            enemyRanks[e.type][e.rank];
+
+        e.hp = rankData.hp;
+    });
 
     // odstráni staré sekcie
     enemies = enemies.filter(e => e.section >= currentSection);
@@ -603,24 +762,24 @@ function collideWithWalls(x, y, size) {
 //////////////////////////
 // UPDATE
 //////////////////////////
-function updatePlayer() {
+function updatePlayer(delta) {
     if (dying) return;
     let newX = player.x;
     let newY = player.y;
-    if (keys["w"]) newY -= player.speed;
-    if (keys["s"]) newY += player.speed;
-    if (keys["a"]) newX -= player.speed;
-    if (keys["d"]) newX += player.speed;
+    if (keys["w"]) newY -= player.speed * delta;
+    if (keys["s"]) newY += player.speed * delta;
+    if (keys["a"]) newX -= player.speed * delta;
+    if (keys["d"]) newX += player.speed * delta;
     if (!collideWithWalls(newX, player.y, player.size)) player.x = newX;
     if (!collideWithWalls(player.x, newY, player.size)) player.y = newY;
     player.angle = Math.atan2(mouse.y - canvas.height / 2, mouse.x - canvas.width / 2);
 }
 
-function updateBullets() {
+function updateBullets(delta) {
     bullets.forEach((b, i) => {
-        b.x += b.dx;
-        b.y += b.dy;
-        b.life--;
+        b.x += b.dx * delta;
+        b.y += b.dy * delta;
+        b.life -= delta;
 
         if (b.life <= 0) {
             bullets.splice(i, 1);
@@ -648,24 +807,30 @@ function updateBullets() {
     });
 }
 
-function updateEnemies() {
+function updateEnemies(delta) {
 
-    enemies.forEach(e => {
+enemies.forEach(e => {
 
-        if (!e.agro) e.agro = 0;
+    if (!e.angle) e.angle = 0;
+
+    if (!e.agro) e.agro = 0;
 
         if (e.agro > 0) {
             e.agro--;
         }
+
+        if (e.angle === undefined) e.angle = 0;
 
         let dx = player.x - e.x;
         let dy = player.y - e.y;
 
         let dist = Math.sqrt(dx * dx + dy * dy);
 
-        let speed = (e.type === "grunt") ? 1.1 : 1.3;
+        const rankData =
+            enemyRanks[e.type][e.rank];
 
-        speed *= diff.enemySpeed;
+        let speed =
+            rankData.speed * diff.enemySpeed;
 
         let activateDist = diff.enemyActivateDist;
 
@@ -702,8 +867,8 @@ function updateEnemies() {
             // PRIBLIŽOVANIE
             if (dist > stopDist) {
 
-                moveX = dx / dist * speed;
-                moveY = dy / dist * speed;
+                moveX = dx / dist * speed * delta;
+                moveY = dy / dist * speed * delta;
             }
 
             // STRAFING
@@ -720,8 +885,8 @@ function updateEnemies() {
 
                 let strafeSpeed = 0.4;
 
-                moveX = (-dy / dist) * strafeSpeed * e.strafeDir;
-                moveY = (dx / dist) * strafeSpeed * e.strafeDir;
+                moveX = (-dy / dist) * strafeSpeed * e.strafeDir * delta;
+                moveY = (dx / dist) * strafeSpeed * e.strafeDir * delta;
 
                 // občas cúvne
                 if (Math.random() < 0.01) {
@@ -761,11 +926,11 @@ function updateEnemies() {
                     let sideX = -dy / dist;
                     let sideY = dx / dist;
 
-                    let try1X = e.x + sideX * speed;
-                    let try1Y = e.y + sideY * speed;
+                    let try1X = e.x + sideX * speed * delta;
+                    let try1Y = e.y + sideY * speed * delta;
 
-                    let try2X = e.x - sideX * speed;
-                    let try2Y = e.y - sideY * speed;
+                    let try2X = e.x - sideX * speed * delta;
+                    let try2Y = e.y - sideY * speed * delta;
 
                     // jedna strana
                     if (!collideWithWalls(try1X, try1Y, 30)) {
@@ -784,7 +949,7 @@ function updateEnemies() {
             }
 
             // streľba
-            e.cooldown--;
+            e.cooldown -= delta;
 
             if (e.cooldown <= 0 && dist < 500) {
 
@@ -794,15 +959,17 @@ function updateEnemies() {
                 );
 
                 // nepresnosť
-                angle += (Math.random() - 0.5) * 0.18;
+                angle +=
+                    (Math.random() - 0.5)
+                    * rankData.accuracy;
 
                 bullets.push({
 
                     x: e.x,
                     y: e.y,
 
-                    dx: Math.cos(angle) * 5,
-                    dy: Math.sin(angle) * 5,
+                    dx: Math.cos(angle) * rankData.bulletSpeed,
+                    dy: Math.sin(angle) * rankData.bulletSpeed,
 
                     size: 5,
 
@@ -816,11 +983,10 @@ function updateEnemies() {
 
 
                 // elite strieľa rýchlejšie
-                e.cooldown = (
-                    (e.type === "grunt")
-                        ? 95 + Math.random() * 30
-                        : 45 + Math.random() * 20
-                ) * diff.enemyFireRate;
+                e.cooldown =
+                    (80 + Math.random() * 25)
+                    * rankData.fireRate
+                    * diff.enemyFireRate;
             }
 
 
@@ -854,7 +1020,6 @@ function checkCollisions() {
                 });
                 bullets.splice(i, 1);
                 if (e.hp <= 0) {
-
                     corpses.push({
 
                         x: e.x,
@@ -862,7 +1027,8 @@ function checkCollisions() {
 
                         angle: e.angle,
 
-                        type: e.type
+                        type: e.type,
+                        rank: e.rank
                     });
 
                     bloods.push({
@@ -908,10 +1074,33 @@ function drawCorpses(offset) {
 
     corpses.forEach(c => {
 
-        let img =
-            c.type === "grunt"
-                ? gruntDeadImg
-                : eliteDeadImg;
+        let img;
+
+        if (c.type === "grunt") {
+
+            img =
+                c.rank === "major"
+                    ? gruntMajorDeadImg
+                    : gruntMinorDeadImg;
+        }
+
+        else {
+
+            if (c.rank === "minor") {
+
+                img = eliteMinorDeadImg;
+            }
+
+            else if (c.rank === "major") {
+
+                img = eliteMajorDeadImg;
+            }
+
+            else {
+
+                img = eliteZealotDeadImg;
+            }
+        }
 
         ctx.save();
 
@@ -950,51 +1139,3 @@ function getOffset() {
 
 
 
-//////////////////////////
-// LOOP
-//////////////////////////
-function gameLoop() {
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    updatePlayer();
-    if (
-        mouseDown &&
-        weapons[player.weapon].automatic
-    ) {
-        shoot();
-    }
-    updateBullets();
-    updateEnemies();
-    checkCollisions();
-
-    regenerateHp();
-
-    checkLevelEnd();
-
-    let offset = getOffset();
-
-    drawBackground(offset);
-    drawWalls(offset);
-    drawCorpses(offset);
-    drawBlood(offset);
-    drawEnemies(offset);
-    drawBullets(offset);
-    drawPlayer();
-    drawHP();
-    drawAmmo();
-
-    updateFade();
-    drawFade();
-    drawDeathFade();
-
-    checkCheckpoints();
-
-    checkDeath();
-    updateDeathFade();
-
-    drawCheckpointText();
-
-    requestAnimationFrame(gameLoop);
-}
-gameLoop();

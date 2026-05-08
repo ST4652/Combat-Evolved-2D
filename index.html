@@ -1,92 +1,327 @@
 <!DOCTYPE html>
 <html lang="sk">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Combat Evolved 2D</title>
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
- 
+
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
- 
+
         body {
-            
-            background-image: url(halo\ ring\ pixelovane\ menu\ 3.png); 
-            
+
+            background-image: url("halo ring pixelovane menu 3.png");
+
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            background-color: #000;
-            
+
+            background-color: black;
+
             height: 100vh;
+
             display: flex;
             justify-content: center;
             align-items: center;
-            
+
+            overflow: hidden;
+
             font-family: 'Press Start 2P', system-ui, sans-serif;
         }
- 
+
         .menu-container {
+
             text-align: center;
             padding: 20px;
         }
- 
+
         .game-title {
-            color: #fff;
+
+            color: white;
+
             font-size: 3rem;
-            margin-bottom: 60px;
+
+            margin-bottom: 70px;
+
             text-transform: uppercase;
-            text-shadow: 4px 4px 0px #000; 
+
+            text-shadow: 4px 4px 0px black;
         }
- 
+
         .menu-options {
+
             display: flex;
             flex-direction: column;
-            gap: 25px;
+
+            gap: 26px;
+
             align-items: center;
         }
- 
+
         .menu-btn {
+
             background: transparent;
-            color: #fff;
+
+            color: white;
+
             border: none;
+
             padding: 10px;
-            font-size: 1.2rem;
+
+            font-size: 1.15rem;
+
             font-family: 'Press Start 2P', system-ui, sans-serif;
+
             cursor: pointer;
+
             text-transform: uppercase;
-            text-shadow: 3px 3px 0px #000; 
-            transition: transform 0.2s ease; 
+
+            text-shadow: 3px 3px 0px black;
+
+            transition:
+                transform 0.18s ease,
+                opacity 0.2s ease;
         }
- 
+
         .menu-btn:hover {
-            transform: scale(1.15);
+
+            transform: scale(1.12);
         }
- 
+
         .menu-btn:active {
-            transform: scale(0.95);
+
+            transform: scale(0.94);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .back-btn {
+
+            margin-top: 30px;
+
+            font-size: 0.8rem;
+
+            opacity: 0.75;
+        }
+
+        .subtitle {
+
+            color: white;
+
+            margin-bottom: 35px;
+
+            font-size: 0.9rem;
+
+            text-shadow: 3px 3px 0px black;
         }
     </style>
 </head>
+
 <body>
- 
+
     <div class="menu-container">
+
         <h1 class="game-title">Combat Evolved 2D</h1>
-        
-        <div class="menu-options">
-            <a href="PoA.html"><button class="menu-btn">QuickStart</button></a>
-            <button class="menu-btn">Load Game</button>
-            <button class="menu-btn">Difficulty</button>
-            <button class="menu-btn">Exit</button>
+
+        <!-- MAIN MENU -->
+        <div id="mainMenu" class="menu-options">
+
+            <button class="menu-btn" onclick="openQuickstart()">
+                QuickStart
+            </button>
+
+            <button class="menu-btn" onclick="openLoadGame()">
+                MISSIONS
+            </button>
+
+            <button class="menu-btn">
+                Difficulty
+            </button>
+
+            <button class="menu-btn" onclick="window.close()">
+                Exit
+            </button>
         </div>
+
+        <!-- QUICKSTART -->
+        <div id="quickstartMenu" class="menu-options hidden">
+
+            <button class="menu-btn"
+                onclick="startGame('PoA.html','easy')">
+                Easy
+            </button>
+
+            <button class="menu-btn"
+                onclick="startGame('PoA.html','normal')">
+                Normal
+            </button>
+
+            <button class="menu-btn"
+                onclick="startGame('PoA.html','heroic')">
+                Heroic
+            </button>
+
+            <button class="menu-btn"
+                onclick="startGame('PoA.html','legendary')">
+                Legendary
+            </button>
+
+            <button class="menu-btn back-btn"
+                onclick="backToMain()">
+                Back
+            </button>
+        </div>
+
+        <!-- LOAD GAME -->
+        <div id="loadMenu" class="menu-options hidden">
+
+
+
+            <button class="menu-btn"
+                onclick="openDifficultyMenu('PoA.html')">
+                Pillar of Autumn
+            </button>
+
+            <button class="menu-btn"
+                onclick="openDifficultyMenu('Halo.html')">
+                Halo
+            </button>
+
+            <button class="menu-btn"
+                onclick="openDifficultyMenu('TaR.html')">
+                Truth and Reconciliation
+            </button>
+
+            <button class="menu-btn"
+                onclick="openDifficultyMenu('SC.html')">
+                The Silent Cartographer
+            </button>
+
+            <button class="menu-btn back-btn"
+                onclick="backToMain()">
+                Back
+            </button>
+        </div>
+
+        <!-- DIFFICULTY AFTER LOAD -->
+        <div id="difficultyMenu" class="menu-options hidden">
+
+
+
+            <button class="menu-btn"
+                onclick="startSelectedLevel('easy')">
+                Easy
+            </button>
+
+            <button class="menu-btn"
+                onclick="startSelectedLevel('normal')">
+                Normal
+            </button>
+
+            <button class="menu-btn"
+                onclick="startSelectedLevel('heroic')">
+                Heroic
+            </button>
+
+            <button class="menu-btn"
+                onclick="startSelectedLevel('legendary')">
+                Legendary
+            </button>
+
+            <button class="menu-btn back-btn"
+                onclick="openLoadGame()">
+                Back
+            </button>
+        </div>
+
     </div>
- 
+
+    <script>
+
+        let selectedLevel = "PoA.html";
+
+        function hideAllMenus() {
+
+            document
+                .querySelectorAll(".menu-options")
+                .forEach(menu => {
+
+                    menu.classList.add("hidden");
+                });
+        }
+
+        function backToMain() {
+
+            hideAllMenus();
+
+            document
+                .getElementById("mainMenu")
+                .classList.remove("hidden");
+        }
+
+        function openQuickstart() {
+
+            hideAllMenus();
+
+            document
+                .getElementById("quickstartMenu")
+                .classList.remove("hidden");
+        }
+
+        function openLoadGame() {
+
+            hideAllMenus();
+
+            document
+                .getElementById("loadMenu")
+                .classList.remove("hidden");
+        }
+
+        function openDifficultyMenu(level) {
+
+            selectedLevel = level;
+
+            hideAllMenus();
+
+            document
+                .getElementById("difficultyMenu")
+                .classList.remove("hidden");
+        }
+
+        function startGame(level, difficulty) {
+
+            localStorage.setItem(
+                "difficulty",
+                difficulty
+            );
+
+            window.location.href = level;
+        }
+
+        function startSelectedLevel(difficulty) {
+
+            localStorage.setItem(
+                "difficulty",
+                difficulty
+            );
+
+            window.location.href = selectedLevel;
+        }
+
+    </script>
+
 </body>
+
 </html>
