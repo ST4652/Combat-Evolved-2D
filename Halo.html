@@ -38,6 +38,12 @@
 
 
 
+
+        
+        
+        
+
+
         let walls = [
 
             // cliff edge
@@ -54,13 +60,13 @@
             { x: 0, y: 40, w: 680, h: 40, texture: "rock" },
             { x: 0, y: 80, w: 560, h: 40, texture: "rock" },
             { x: 0, y: 120, w: 480, h: 40, texture: "rock" },
-            { x: 0, y: 160, w: 420, h: 40, texture: "rock" },
-            { x: 0, y: 200, w: 300, h: 40, texture: "rock" },
-            { x: 0, y: 240, w: 220, h: 40, texture: "rock" },
-            { x: 0, y: 280, w: 180, h: 80, texture: "rock" },
-            { x: 0, y: 360, w: 140, h: 160, texture: "rock" },
-            { x: 0, y: 520, w: 100, h: 40, texture: "rock" },
-            { x: 0, y: 560, w: 20, h: 40, texture: "rock" },  //najkratsi/najviac nalavo
+            { x: 0, y: 160, w: 440, h: 40, texture: "rock" },
+            { x: 0, y: 200, w: 320, h: 40, texture: "rock" },
+            { x: 0, y: 240, w: 240, h: 40, texture: "rock" },
+            { x: 0, y: 280, w: 200, h: 80, texture: "rock" },
+            { x: 0, y: 360, w: 160, h: 160, texture: "rock" },
+            { x: 0, y: 520, w: 120, h: 40, texture: "rock" },
+            { x: 0, y: 560, w: 40, h: 40, texture: "rock" },  //najkratsi/najviac nalavo
             { x: 0, y: 600, w: 200, h: 40, texture: "rock" },
             { x: 0, y: 640, w: 320, h: 40, texture: "rock" },
             { x: 0, y: 680, w: 400, h: 40, texture: "rock" },
@@ -311,30 +317,58 @@
 
             floors.forEach(f => {
                 // Podlaha
+                const BIG_TILE = 2400;
+                const SCALE = 1.25;
+
+
                 for (
                     let tx = f.x;
                     tx < f.x + f.w;
-                    tx += TILE_SIZE
+                    tx += BIG_TILE
                 ) {
 
                     for (
                         let ty = f.y;
                         ty < f.y + f.h;
-                        ty += TILE_SIZE
-                    ) {
+                        ty += BIG_TILE
+                    ) {if (
+    tx + BIG_TILE < offset.x ||
+    tx > offset.x + canvas.width ||
+    ty + BIG_TILE < offset.y ||
+    ty > offset.y + canvas.height
+) {
+    continue;
+}
+
+                        // koľko sa reálne má vykresliť
+                        let drawW = Math.min(
+                            BIG_TILE,
+                            f.x + f.w - tx
+                        );
+
+                        let drawH = Math.min(
+                            BIG_TILE,
+                            f.y + f.h - ty
+                        );
 
                         ctx.drawImage(
-                            grassTile,
 
+                            grassBig,
+
+                            0,
+                            0,
+
+                            drawW / SCALE,
+                            drawH / SCALE,
 
                             Math.round(tx - offset.x),
                             Math.round(ty - offset.y),
 
-                            TILE_SIZE,
-                            TILE_SIZE
-                        );
+                            drawW,
+                            drawH
+                        )
                     }
-                };
+                }
 
                 // Mriežka - clip na floor, globálne zarovnaná
                 /*  ctx.save();
@@ -370,9 +404,10 @@
 
         function drawWalls(offset) {
 
+            const SCALE = 1.25;
+
             walls.forEach(w => {
 
-                // mimo obrazovky
                 if (
                     w.x + w.w < offset.x ||
                     w.x > offset.x + canvas.width ||
@@ -384,14 +419,18 @@
 
                 let img = rockBigTile;
 
+                // veľkosť source oblasti
+                let srcW = w.w / SCALE;
+                let srcH = w.h / SCALE;
+
                 ctx.drawImage(
 
                     img,
 
                     0,
                     0,
-                    w.w,
-                    w.h,
+                    srcW,
+                    srcH,
 
                     Math.round(w.x - offset.x),
                     Math.round(w.y - offset.y),

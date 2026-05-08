@@ -40,7 +40,14 @@ grassBig.src = "trava 2400x2400.png";
 
 
 
-const TILE_SIZE = 40;
+
+
+
+
+
+const TEXTURE_SCALE = 1.25;
+
+//const TILE_SIZE = 40;
 
 
 
@@ -212,11 +219,16 @@ let lastTime = 0;
 
 function gameLoop(timestamp) {
 
-    let delta = (timestamp - lastTime) / 16.67;
-
+    let delta = (timestamp - lastTime) / 166.67;
     lastTime = timestamp;
 
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
     updatePlayer(delta);
+    updateBullets(delta);
+    updateEnemies(delta);
+
+
 
     requestAnimationFrame(gameLoop);
 }
@@ -567,9 +579,24 @@ function collideRect(x, y, size, w) {
 }
 
 function collideWithWalls(x, y, size) {
+
     for (let w of walls) {
-        if (collideRect(x, y, size, w)) return true;
+
+        // ďaleko → skip
+        if (
+            w.x > x + 300 ||
+            w.x + w.w < x - 300 ||
+            w.y > y + 300 ||
+            w.y + w.h < y - 300
+        ) {
+            continue;
+        }
+
+        if (collideRect(x, y, size, w)) {
+            return true;
+        }
     }
+
     return false;
 }
 
