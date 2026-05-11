@@ -1,7 +1,7 @@
 let difficulty =
-    localStorage.getItem("difficulty")
-    || "heroic";
-let gameSpeed = 1.4;    //1.4
+    localStorage.getItem("difficulty") || 
+    "test";
+let gameSpeed = 1.35;    //1.4
 
 
 
@@ -19,7 +19,7 @@ const arPlayerImg = new Image();
 arPlayerImg.src = "masta chief ar v2.png";
 
 const gruntMinorImg = new Image();
-gruntMinorImg.src = "grunt minor.png";
+gruntMinorImg.src = "grunt minor v2.png";
 
 const gruntMajorImg = new Image();
 gruntMajorImg.src = "grunt major.png";
@@ -31,13 +31,13 @@ const eliteMajorImg = new Image();
 eliteMajorImg.src = "elite major.png";
 
 const eliteZealotImg = new Image();
-eliteZealotImg.src = "elite zealot.png";
+eliteZealotImg.src = "elite zealot v3.png";
 
 
 
 // TERRAIN TEXTURY
 const grassTile = new Image();
-grassTile.src = "trava v14.png";     //v14 final
+grassTile.src = "trava 2400x2400.png";     //v14 final
 
 const mostTile = new Image();
 mostTile.src = "most v9.png";       //potom most v9.png
@@ -198,7 +198,6 @@ const enemyRanks = {
             speed: 1.0,
             accuracy: 0.22,
             fireRate: 1.0,
-
             bulletSpeed: 5,
 
             texture: "minor",
@@ -208,8 +207,7 @@ const enemyRanks = {
             hp: 3,
             speed: 1.18,
             accuracy: 0.14,
-            fireRate: 0.82,
-
+            fireRate: 0.85,
             bulletSpeed: 5.8,
 
             texture: "major",
@@ -223,7 +221,6 @@ const enemyRanks = {
             speed: 1.15,
             accuracy: 0.12,
             fireRate: 0.72,
-
             bulletSpeed: 6,
 
             texture: "minor",
@@ -234,22 +231,23 @@ const enemyRanks = {
             speed: 1.32,
             accuracy: 0.08,
             fireRate: 0.58,
-
             bulletSpeed: 6.5,
 
             texture: "major",
         },
 
-        zealot: {
+zealot: {
             hp: 8,
-            speed: 1.45,
+            speed: 1.90,
             accuracy: 0.035,
             fireRate: 0.42,
+    bulletSpeed: 7.2,
 
-            bulletSpeed: 7.2,
+    texture: "zealot",
 
-            texture: "zealot",
-        }
+    melee: true,
+    meleeRange: 65,
+}
     }
 };
 
@@ -582,7 +580,7 @@ const bloodImg = new Image();
 bloodImg.src = "blood v3.png";        //v3 asi nejlepsie
 
 const gruntMinorDeadImg = new Image();
-gruntMinorDeadImg.src = "grunt minor dead.png";
+gruntMinorDeadImg.src = "grunt minor dead v2.png";
 
 const gruntMajorDeadImg = new Image();
 gruntMajorDeadImg.src = "grunt major dead.png";
@@ -594,7 +592,7 @@ const eliteMajorDeadImg = new Image();
 eliteMajorDeadImg.src = "elite major dead.png";
 
 const eliteZealotDeadImg = new Image();
-eliteZealotDeadImg.src = "elite zealot dead.png";
+eliteZealotDeadImg.src = "elite zealot dead v2.png";
 
 
 
@@ -836,6 +834,10 @@ enemies.forEach(e => {
 
         let stopDist = (e.type === "grunt") ? 170 : 210;
 
+        if (e.rank === "zealot") {
+    stopDist = 0;
+}
+
         // enemy AI variables
         if (!e.strafeDir) e.strafeDir = 1;
         if (!e.changeDirTime) e.changeDirTime = 0;
@@ -948,10 +950,28 @@ enemies.forEach(e => {
                 }
             }
 
+
+            // ENERGY SWORD ATTACK
+if (
+    rankData.melee &&
+    dist < rankData.meleeRange
+) {
+
+    player.hp = 0;
+
+    player.lastHitTime = Date.now();
+
+    return;
+}
+
             // streľba
             e.cooldown -= delta;
 
-            if (e.cooldown <= 0 && dist < 500) {
+if (
+    !rankData.melee &&
+    e.cooldown <= 0 &&
+    dist < 500
+) {
 
                 let angle = Math.atan2(
                     player.y - e.y,
