@@ -235,13 +235,13 @@
 
 
 
-
+/*
             //toto ti co su na zacitaku
             { x: 150, y: 10, type: "grunt", rank: "minor", cooldown: 0, section: 99 },
             { x: 200, y: 10, type: "grunt", rank: "major", cooldown: 0, section: 99 },
             { x: 250, y: 10, type: "elite", rank: "minor", cooldown: 0, section: 99 },
             { x: 300, y: 10, type: "elite", rank: "major", cooldown: 0, section: 99 },
-            { x: 350, y: 10, type: "elite", rank: "zealot", cooldown: 0, section: 99 },   // 350 10
+            { x: 350, y: 10, type: "elite", rank: "zealot", cooldown: 0, section: 99 },   // 350 10*/
         ];
 
 
@@ -423,7 +423,7 @@
                 // VEĽKÉ TEXTÚRY
                 if (img && usePattern) {
 
-ctx.save();
+                    ctx.save();
 
 ctx.scale(TEXTURE_SCALE, TEXTURE_SCALE);
 
@@ -447,8 +447,6 @@ ctx.fillRect(
 );
 
 ctx.restore();
-
-                    ctx.restore();
                 }
 
                 // MALÉ TILE TEXTÚRY

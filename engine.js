@@ -1,7 +1,7 @@
 let difficulty =
     localStorage.getItem("difficulty") || 
-    "test";
-let gameSpeed = 1.35;    //1.4
+    "legendary";
+let gameSpeed = 1.75;    //1.4   skor 1.75
 
 
 
@@ -56,6 +56,7 @@ rockBigTile.src = "kamen 1280x1280.png";
 
 const grassBig = new Image();
 grassBig.src = "trava 2400x2400.png";
+
 
 
 
@@ -120,7 +121,7 @@ let weapons = {
 
 
 //////////////////////////
-// OBTIAŽNOSŤ
+// narocnosti
 //////////////////////////
 
 
@@ -240,7 +241,7 @@ zealot: {
             hp: 8,
             speed: 1.90,
             accuracy: 0.035,
-            fireRate: 0.42,
+            fireRate: 0,
     bulletSpeed: 7.2,
 
     texture: "zealot",
@@ -952,16 +953,24 @@ enemies.forEach(e => {
 
 
             // ENERGY SWORD ATTACK
-if (
-    rankData.melee &&
-    dist < rankData.meleeRange
-) {
+if (rankData.melee) {
 
-    player.hp = 0;
+    let realDx = player.x - e.x;
+    let realDy = player.y - e.y;
 
-    player.lastHitTime = Date.now();
+    let realDist = Math.sqrt(
+        realDx * realDx +
+        realDy * realDy
+    );
 
-    return;
+    if (realDist < rankData.meleeRange) {
+
+        player.hp = 0;
+
+        player.lastHitTime = Date.now();
+
+        return;
+    }
 }
 
             // streľba
