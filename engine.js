@@ -1,7 +1,7 @@
 let difficulty =
-    localStorage.getItem("difficulty") || 
+    localStorage.getItem("difficulty") ||
     "legendary";
-let gameSpeed = 1.75;    //1.4   skor 1.75
+let gameSpeed = 1.6;    //1.4   skor 1.75
 
 
 
@@ -219,7 +219,7 @@ const enemyRanks = {
 
         minor: {
             hp: 4,
-            speed: 1.15,
+            speed: 1.3,
             accuracy: 0.12,
             fireRate: 0.72,
             bulletSpeed: 6,
@@ -229,7 +229,7 @@ const enemyRanks = {
 
         major: {
             hp: 6,
-            speed: 1.32,
+            speed: 1.45,
             accuracy: 0.08,
             fireRate: 0.58,
             bulletSpeed: 6.5,
@@ -237,31 +237,31 @@ const enemyRanks = {
             texture: "major",
         },
 
-zealot: {
+        zealot: {
             hp: 8,
-            speed: 1.90,
+            speed: 2.5,
             accuracy: 0.035,
             fireRate: 0,
-    bulletSpeed: 7.2,
+            bulletSpeed: 7.2,
 
-    texture: "zealot",
+            texture: "zealot",
 
-    melee: true,
-    meleeRange: 65,
-}
+            melee: true,
+            meleeRange: 65,
+        }
     }
 };
 
 
 
- const originalEnemies = structuredClone(enemies);
-        enemies.forEach(e => {
+const originalEnemies = structuredClone(enemies);
+enemies.forEach(e => {
 
-            const rankData =
-                enemyRanks[e.type][e.rank];
+    const rankData =
+        enemyRanks[e.type][e.rank];
 
-            e.hp = rankData.hp;
-        });
+    e.hp = rankData.hp;
+});
 
 
 //////////////////////////
@@ -272,7 +272,7 @@ let player = {
     x: 500,        //500 obidve      //naposledy na Halo 2600,1600
     y: 500,
     size: 80,
-    speed: 2.0,     //2.0 dat potom
+    speed: 2.5,     //2.0 dat potom
     angle: 0,
 
     hp: diff.playerHp,     //70bolo
@@ -762,16 +762,48 @@ function collideWithWalls(x, y, size) {
 // UPDATE
 //////////////////////////
 function updatePlayer(delta) {
+
     if (dying) return;
-    let newX = player.x;
-    let newY = player.y;
-    if (keys["w"]) newY -= player.speed * delta;
-    if (keys["s"]) newY += player.speed * delta;
-    if (keys["a"]) newX -= player.speed * delta;
-    if (keys["d"]) newX += player.speed * delta;
-    if (!collideWithWalls(newX, player.y, player.size)) player.x = newX;
-    if (!collideWithWalls(player.x, newY, player.size)) player.y = newY;
-    player.angle = Math.atan2(mouse.y - canvas.height / 2, mouse.x - canvas.width / 2);
+
+    let moveX = 0;
+    let moveY = 0;
+
+    // input
+    if (keys["w"]) moveY -= 1;
+    if (keys["s"]) moveY += 1;
+    if (keys["a"]) moveX -= 1;
+    if (keys["d"]) moveX += 1;
+
+    // NORMALIZÁCIA DIAGONÁLY
+    let length = Math.hypot(moveX, moveY);
+
+    if (length > 0) {
+
+        moveX /= length;
+        moveY /= length;
+    }
+
+    // movement
+    let newX =
+        player.x + moveX * player.speed * delta;
+
+    let newY =
+        player.y + moveY * player.speed * delta;
+
+    // collision
+    if (!collideWithWalls(newX, player.y, player.size)) {
+        player.x = newX;
+    }
+
+    if (!collideWithWalls(player.x, newY, player.size)) {
+        player.y = newY;
+    }
+
+    // aim angle
+    player.angle = Math.atan2(
+        mouse.y - canvas.height / 2,
+        mouse.x - canvas.width / 2
+    );
 }
 
 function updateBullets(delta) {
@@ -808,22 +840,14 @@ function updateBullets(delta) {
 
 function updateEnemies(delta) {
 
-enemies.forEach(e => {
+    enemies.forEach(e => {
 
-    if (!e.angle) e.angle = 0;
-
-    if (!e.agro) e.agro = 0;
+        if (!e.angle) e.angle = 0;
+        if (!e.agro) e.agro = 0;
 
         if (e.agro > 0) {
             e.agro--;
         }
-
-        if (e.angle === undefined) e.angle = 0;
-
-        let dx = player.x - e.x;
-        let dy = player.y - e.y;
-
-        let dist = Math.sqrt(dx * dx + dy * dy);
 
         const rankData =
             enemyRanks[e.type][e.rank];
@@ -833,48 +857,71 @@ enemies.forEach(e => {
 
         let activateDist = diff.enemyActivateDist;
 
-        let stopDist = (e.type === "grunt") ? 170 : 210;
+        let stopDist =
+            (e.type === "grunt") ? 170 : 210;
 
         if (e.rank === "zealot") {
-    stopDist = 0;
-}
+            stopDist = 0;
+        }
 
-        // enemy AI variables
+        // AI variables
         if (!e.strafeDir) e.strafeDir = 1;
         if (!e.changeDirTime) e.changeDirTime = 0;
         if (!e.lastPlayerX) e.lastPlayerX = player.x;
         if (!e.lastPlayerY) e.lastPlayerY = player.y;
 
-        // zapamätanie poslednej pozície hráča
-        if (dist < activateDist) {
-            e.lastPlayerX = player.x;
-            e.lastPlayerY = player.y;
-        }
+        // REAL vzdialenosť k hráčovi
+        let realDx = player.x - e.x;
+        let realDy = player.y - e.y;
+
+        let realDist = Math.sqrt(
+            realDx * realDx +
+            realDy * realDy
+        );
+
+        // ak vidí hráča → zapamätá si pozíciu
+       let seesPlayer =
+
+    Math.abs(realDx) < activateDist * 1.1 &&
+    Math.abs(realDy) < activateDist * 0.7;
+
+if (seesPlayer) {
+
+    e.lastPlayerX = player.x;
+    e.lastPlayerY = player.y;
+}
 
         // ide ku poslednej známej pozícii
         let targetX = e.lastPlayerX;
         let targetY = e.lastPlayerY;
 
-        dx = targetX - e.x;
-        dy = targetY - e.y;
+        let dx = targetX - e.x;
+        let dy = targetY - e.y;
 
-        dist = Math.sqrt(dx * dx + dy * dy);
+        let dist = Math.sqrt(dx * dx + dy * dy);
 
-        if (dist < activateDist + 200 || e.agro > 0) {
-
-            e.angle = Math.atan2(dy, dx);
+       if (seesPlayer || e.agro > 0) {
+            // OTOČENIE PODĽA REÁLNEHO HRÁČA
+            e.angle = Math.atan2(realDy, realDx);
 
             let moveX = 0;
             let moveY = 0;
 
-            // PRIBLIŽOVANIE
+            // približovanie
             if (dist > stopDist) {
 
-                moveX = dx / dist * speed * delta;
-                moveY = dy / dist * speed * delta;
+                moveX =
+                    (dx / dist) *
+                    speed *
+                    delta;
+
+                moveY =
+                    (dy / dist) *
+                    speed *
+                    delta;
             }
 
-            // STRAFING
+            // strafing
             else {
 
                 e.changeDirTime--;
@@ -883,67 +930,85 @@ enemies.forEach(e => {
 
                     e.strafeDir *= -1;
 
-                    e.changeDirTime = 40 + Math.random() * 80;
+                    e.changeDirTime =
+                        40 + Math.random() * 80;
                 }
 
                 let strafeSpeed = 0.4;
 
-                moveX = (-dy / dist) * strafeSpeed * e.strafeDir * delta;
-                moveY = (dx / dist) * strafeSpeed * e.strafeDir * delta;
+                moveX =
+                    (-realDy / realDist) *
+                    strafeSpeed *
+                    e.strafeDir *
+                    delta;
 
-                // občas cúvne
-                if (Math.random() < 0.01) {
-
-                }
+                moveY =
+                    (realDx / realDist) *
+                    strafeSpeed *
+                    e.strafeDir *
+                    delta;
             }
 
-            // pokus o pohyb
+            // movement
             let newX = e.x + moveX;
             let newY = e.y + moveY;
 
-            // normálny pohyb
             if (!collideWithWalls(newX, newY, 30)) {
 
                 e.x = newX;
                 e.y = newY;
             }
 
-            // ak narazí do steny
             else {
 
-                // skúsi X samostatne
                 if (!collideWithWalls(newX, e.y, 30)) {
 
                     e.x = newX;
                 }
 
-                // skúsi Y samostatne
-                else if (!collideWithWalls(e.x, newY, 30)) {
+                else if (
+                    !collideWithWalls(e.x, newY, 30)
+                ) {
 
                     e.y = newY;
                 }
 
-                // ak stále nevie ísť → skúsi obísť stenu
                 else {
 
                     let sideX = -dy / dist;
                     let sideY = dx / dist;
 
-                    let try1X = e.x + sideX * speed * delta;
-                    let try1Y = e.y + sideY * speed * delta;
+                    let try1X =
+                        e.x + sideX * speed * delta;
 
-                    let try2X = e.x - sideX * speed * delta;
-                    let try2Y = e.y - sideY * speed * delta;
+                    let try1Y =
+                        e.y + sideY * speed * delta;
 
-                    // jedna strana
-                    if (!collideWithWalls(try1X, try1Y, 30)) {
+                    let try2X =
+                        e.x - sideX * speed * delta;
+
+                    let try2Y =
+                        e.y - sideY * speed * delta;
+
+                    if (
+                        !collideWithWalls(
+                            try1X,
+                            try1Y,
+                            30
+                        )
+                    ) {
 
                         e.x = try1X;
                         e.y = try1Y;
                     }
 
-                    // druhá strana
-                    else if (!collideWithWalls(try2X, try2Y, 30)) {
+                    else if (
+                        !collideWithWalls(
+                            try2X,
+                            try2Y,
+                            30
+                        )
+                    ) {
 
                         e.x = try2X;
                         e.y = try2Y;
@@ -951,43 +1016,43 @@ enemies.forEach(e => {
                 }
             }
 
+            // ENERGY SWORD
+            if (rankData.melee) {
 
-            // ENERGY SWORD ATTACK
-if (rankData.melee) {
+                if (realDist < rankData.meleeRange) {
 
-    let realDx = player.x - e.x;
-    let realDy = player.y - e.y;
+                    player.hp = 0;
 
-    let realDist = Math.sqrt(
-        realDx * realDx +
-        realDy * realDy
-    );
+                    player.lastHitTime =
+                        Date.now();
 
-    if (realDist < rankData.meleeRange) {
+                    return;
+                }
+            }
 
-        player.hp = 0;
+            let shootDist = 480;
 
-        player.lastHitTime = Date.now();
+// ak bol enemy zasiahnutý
+if (e.agro > 0) {
 
-        return;
-    }
+    shootDist = 99999;
 }
 
-            // streľba
+            // STREĽBA
             e.cooldown -= delta;
 
-if (
-    !rankData.melee &&
-    e.cooldown <= 0 &&
-    dist < 500
-) {
+            if (
+                !rankData.melee &&
+                e.cooldown <= 0 &&
+                seesPlayer &&
+    realDist < shootDist          //vzdialenost
+            ) {
 
                 let angle = Math.atan2(
                     player.y - e.y,
                     player.x - e.x
                 );
 
-                // nepresnosť
                 angle +=
                     (Math.random() - 0.5)
                     * rankData.accuracy;
@@ -997,8 +1062,13 @@ if (
                     x: e.x,
                     y: e.y,
 
-                    dx: Math.cos(angle) * rankData.bulletSpeed,
-                    dy: Math.sin(angle) * rankData.bulletSpeed,
+                    dx:
+                        Math.cos(angle)
+                        * rankData.bulletSpeed,
+
+                    dy:
+                        Math.sin(angle)
+                        * rankData.bulletSpeed,
 
                     size: 5,
 
@@ -1006,19 +1076,14 @@ if (
 
                     enemyType: e.type,
 
-                    life: 140
+                    life: 140   //140 bolo
                 });
 
-
-
-                // elite strieľa rýchlejšie
                 e.cooldown =
                     (80 + Math.random() * 25)
                     * rankData.fireRate
                     * diff.enemyFireRate;
             }
-
-
         }
     });
 }
@@ -1037,7 +1102,7 @@ function checkCollisions() {
                 e.lastPlayerX = player.x;
                 e.lastPlayerY = player.y;
 
-                e.agro = 600;
+                e.agro = 480;
                 bloods.push({
 
                     x: b.x,
