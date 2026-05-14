@@ -1,5 +1,5 @@
 let difficulty =
-  //localStorage.getItem("difficulty") ||
+  localStorage.getItem("difficulty") ||
    // "test";
     "legendary";
 let gameSpeed = 1.6;    //1.4   skor 1.75
@@ -59,17 +59,34 @@ const grassBig = new Image();
 grassBig.src = "trava 2400x2400.png";
 
 
-
-
-
-
-
-
-
-
 const TEXTURE_SCALE = 1.25;
 
 //const TILE_SIZE = 40;
+
+
+
+
+//////////////////////////
+// ZVUKY
+//////////////////////////
+
+const dmrShotSound = new Audio("DMR sound v2.mp3");
+
+const arLoopSound = new Audio("AR sound v2.mp3");
+
+arLoopSound.loop = true;
+
+arLoopSound.volume = 0.45;
+dmrShotSound.volume = 0.6;
+
+
+// ENEMY ZVUKY
+const plasmaShotSound = new Audio("DMR sound v2.mp3");
+
+const needlerShotSound = new Audio("DMR sound v2.mp3");
+
+plasmaShotSound.volume = 0.25;
+needlerShotSound.volume = 0.25;
 
 
 
@@ -97,7 +114,7 @@ let weapons = {
         damage: 2,
         bulletSpeed: 20,
         fireRate: 320, // ms medzi výstrelmi
-        spread: 0.08,
+        spread: 0.04,
         automatic: false,
         reloadTime: 1300,
         magSize: 12,
@@ -108,7 +125,7 @@ let weapons = {
         damage: 0.7,               //0.7
         bulletSpeed: 15,
         fireRate: 160,              //140
-        spread: 0.19,             //0.16
+        spread: 0.12,             //0.16
         automatic: true,
         reloadTime: 1600,
         magSize: 36,              //36
@@ -426,13 +443,38 @@ canvas.addEventListener("click", () => {
 //automaticke stielanie
 ///////////////
 let mouseDown = false;
+let arSoundPlaying = false;
 
 canvas.addEventListener("mousedown", () => {
+
+    if (player.reloading) return;
+
     mouseDown = true;
+    mouseDown = true;
+
+    // AR loop zvuk
+    if (
+        player.weapon === "ar" &&
+        !arSoundPlaying
+    ) {
+
+        arLoopSound.currentTime = 0;
+
+        arLoopSound.play();
+
+        arSoundPlaying = true;
+    }
 });
 
 canvas.addEventListener("mouseup", () => {
+
     mouseDown = false;
+
+    arLoopSound.pause();
+
+    arLoopSound.currentTime = 0;
+
+    arSoundPlaying = false;
 });
 
 
@@ -461,6 +503,19 @@ function shoot() {
     player.lastShot = now;
 
     player.ammo[player.weapon]--;
+
+    //////////////////////////
+// ZVUKY STREĽBY
+//////////////////////////
+
+if (player.weapon === "dmr") {
+
+    let s = dmrShotSound.cloneNode();
+
+    s.volume = 0.6;
+
+    s.play();
+}
 
     let angle = Math.atan2(
         mouse.y - canvas.height / 2,
@@ -501,16 +556,33 @@ function reloadWeapon() {
 
     player.reloading = true;
 
+    arLoopSound.pause();
+
+    arLoopSound.currentTime = 0;
+
+    arSoundPlaying = false;
+
     setTimeout(() => {
 
         player.ammo[player.weapon] =
             weapons[player.weapon].magSize;
 
         player.reloading = false;
+        // znovu spusti AR zvuk ak hráč stále drží myš
+if (
+    mouseDown &&
+    player.weapon === "ar"
+) {
+
+    arLoopSound.currentTime = 0;
+
+    arLoopSound.play();
+
+    arSoundPlaying = true;
+}
 
     }, weapons[player.weapon].reloadTime);
 }
-
 
 
 
@@ -520,11 +592,15 @@ function reloadWeapon() {
 
 document.addEventListener("keydown", e => {
 
-    if (e.key === "+") {
+if (e.key === "+") {
 
-        player.weapon = "dmr";
+    player.weapon = "dmr";
 
-    }
+    arLoopSound.pause();
+arLoopSound.currentTime = 0.1;
+
+    arSoundPlaying = false;
+}
 
     if (e.key === "ľ") {
 
@@ -1014,7 +1090,24 @@ if (
                 angle +=
                     (Math.random() - 0.5)
                     * rankData.accuracy;
+// ENEMY SHOOT SOUND
+if (e.type === "elite") {
 
+    let s = plasmaShotSound.cloneNode();
+
+    s.volume = 0.25;
+
+    s.play();
+}
+
+if (e.type === "grunt") {
+
+    let s = needlerShotSound.cloneNode();
+
+    s.volume = 0.25;
+
+    s.play();
+}
                 bullets.push({
 
                     x: e.x,
