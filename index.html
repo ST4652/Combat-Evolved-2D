@@ -331,7 +331,20 @@
         }
 
     </script>
+<audio id="bgMusic" src="menu_music.mp3" loop></audio>
 
+<script>
+    const music = document.getElementById("bgMusic");
+
+    function startMusic() {
+        music.play().catch(() => {});
+        document.removeEventListener("click", startMusic);
+        document.removeEventListener("keydown", startMusic);
+    }
+
+    document.addEventListener("click", startMusic);
+    document.addEventListener("keydown", startMusic);
+</script>
 </body>
 
 </html>
