@@ -1,5 +1,6 @@
 let difficulty =
-    localStorage.getItem("difficulty") ||
+  //localStorage.getItem("difficulty") ||
+   // "test";
     "legendary";
 let gameSpeed = 1.6;    //1.4   skor 1.75
 
@@ -94,7 +95,7 @@ hudFont.load().then(font => {
 let weapons = {
     dmr: {
         damage: 2,
-        bulletSpeed: 14,
+        bulletSpeed: 20,
         fireRate: 320, // ms medzi výstrelmi
         spread: 0.08,
         automatic: false,
@@ -104,12 +105,12 @@ let weapons = {
     },
 
     ar: {
-        damage: 0.8,               //0.8
-        bulletSpeed: 11,
-        fireRate: 140,              //140
+        damage: 0.7,               //0.7
+        bulletSpeed: 15,
+        fireRate: 160,              //140
         spread: 0.19,             //0.16
         automatic: true,
-        reloadTime: 2200,
+        reloadTime: 1600,
         magSize: 36,              //36
         color: "#ff8800"
     }
@@ -272,7 +273,7 @@ let player = {
     x: 500,        //500 obidve      //naposledy na Halo 2600,1600
     y: 500,
     size: 80,
-    speed: 2.5,     //2.0 dat potom
+    speed: 2.5,     //2.0 dat potom   2.5 po novom zevraj
     angle: 0,
 
     hp: diff.playerHp,     //70bolo
@@ -703,17 +704,7 @@ function checkLevelEnd() {
     }
 }
 
-function updateFade() {
 
-    if (fading) {
-
-        fadeAlpha += 0.01;
-
-        if (fadeAlpha >= 1) {
-            window.location.href = "Halo.html";
-        }
-    }
-}
 
 
 
@@ -840,14 +831,22 @@ function updateBullets(delta) {
 
 function updateEnemies(delta) {
 
-    enemies.forEach(e => {
+enemies.forEach(e => {
 
-        if (!e.angle) e.angle = 0;
-        if (!e.agro) e.agro = 0;
+    if (!e.angle) e.angle = 0;
+
+    if (!e.agro) e.agro = 0;
 
         if (e.agro > 0) {
             e.agro--;
         }
+
+        if (e.angle === undefined) e.angle = 0;
+
+        let dx = player.x - e.x;
+        let dy = player.y - e.y;
+
+        let dist = Math.sqrt(dx * dx + dy * dy);
 
         const rankData =
             enemyRanks[e.type][e.rank];
@@ -857,71 +856,48 @@ function updateEnemies(delta) {
 
         let activateDist = diff.enemyActivateDist;
 
-        let stopDist =
-            (e.type === "grunt") ? 170 : 210;
+        let stopDist = (e.type === "grunt") ? 170 : 210;
 
         if (e.rank === "zealot") {
-            stopDist = 0;
-        }
+    stopDist = 0;
+}
 
-        // AI variables
+        // enemy AI variables
         if (!e.strafeDir) e.strafeDir = 1;
         if (!e.changeDirTime) e.changeDirTime = 0;
         if (!e.lastPlayerX) e.lastPlayerX = player.x;
         if (!e.lastPlayerY) e.lastPlayerY = player.y;
 
-        // REAL vzdialenosť k hráčovi
-        let realDx = player.x - e.x;
-        let realDy = player.y - e.y;
-
-        let realDist = Math.sqrt(
-            realDx * realDx +
-            realDy * realDy
-        );
-
-        // ak vidí hráča → zapamätá si pozíciu
-       let seesPlayer =
-
-    Math.abs(realDx) < activateDist * 1.1 &&
-    Math.abs(realDy) < activateDist * 0.7;
-
-if (seesPlayer) {
-
-    e.lastPlayerX = player.x;
-    e.lastPlayerY = player.y;
-}
+        // zapamätanie poslednej pozície hráča
+        if (dist < activateDist) {
+            e.lastPlayerX = player.x;
+            e.lastPlayerY = player.y;
+        }
 
         // ide ku poslednej známej pozícii
         let targetX = e.lastPlayerX;
         let targetY = e.lastPlayerY;
 
-        let dx = targetX - e.x;
-        let dy = targetY - e.y;
+        dx = targetX - e.x;
+        dy = targetY - e.y;
 
-        let dist = Math.sqrt(dx * dx + dy * dy);
+        dist = Math.sqrt(dx * dx + dy * dy);
 
-       if (seesPlayer || e.agro > 0) {
-            // OTOČENIE PODĽA REÁLNEHO HRÁČA
-            e.angle = Math.atan2(realDy, realDx);
+        if (dist < activateDist + 200 || e.agro > 0) {
+
+            e.angle = Math.atan2(dy, dx);
 
             let moveX = 0;
             let moveY = 0;
 
-            // približovanie
+            // PRIBLIŽOVANIE
             if (dist > stopDist) {
 
-                moveX =
-                    (dx / dist) *
-                    speed *
-                    delta;
-
-                moveY =
-                    (dy / dist) *
-                    speed *
-                    delta;
+                moveX = dx / dist * speed * delta;
+                moveY = dy / dist * speed * delta;
             }
 
-            // strafing
+            // STRAFING
             else {
 
                 e.changeDirTime--;
@@ -930,85 +906,67 @@ if (seesPlayer) {
 
                     e.strafeDir *= -1;
 
-                    e.changeDirTime =
-                        40 + Math.random() * 80;
+                    e.changeDirTime = 40 + Math.random() * 80;
                 }
 
                 let strafeSpeed = 0.4;
 
-                moveX =
-                    (-realDy / realDist) *
-                    strafeSpeed *
-                    e.strafeDir *
-                    delta;
+                moveX = (-dy / dist) * strafeSpeed * e.strafeDir * delta;
+                moveY = (dx / dist) * strafeSpeed * e.strafeDir * delta;
 
-                moveY =
-                    (realDx / realDist) *
-                    strafeSpeed *
-                    e.strafeDir *
-                    delta;
+                // občas cúvne
+                if (Math.random() < 0.01) {
+
+                }
             }
 
-            // movement
+            // pokus o pohyb
             let newX = e.x + moveX;
             let newY = e.y + moveY;
 
+            // normálny pohyb
             if (!collideWithWalls(newX, newY, 30)) {
 
                 e.x = newX;
                 e.y = newY;
             }
 
+            // ak narazí do steny
             else {
 
+                // skúsi X samostatne
                 if (!collideWithWalls(newX, e.y, 30)) {
 
                     e.x = newX;
                 }
 
-                else if (
-                    !collideWithWalls(e.x, newY, 30)
-                ) {
+                // skúsi Y samostatne
+                else if (!collideWithWalls(e.x, newY, 30)) {
 
                     e.y = newY;
                 }
 
+                // ak stále nevie ísť → skúsi obísť stenu
                 else {
 
                     let sideX = -dy / dist;
                     let sideY = dx / dist;
 
-                    let try1X =
-                        e.x + sideX * speed * delta;
+                    let try1X = e.x + sideX * speed * delta;
+                    let try1Y = e.y + sideY * speed * delta;
 
-                    let try1Y =
-                        e.y + sideY * speed * delta;
+                    let try2X = e.x - sideX * speed * delta;
+                    let try2Y = e.y - sideY * speed * delta;
 
-                    let try2X =
-                        e.x - sideX * speed * delta;
-
-                    let try2Y =
-                        e.y - sideY * speed * delta;
-
-                    if (
-                        !collideWithWalls(
-                            try1X,
-                            try1Y,
-                            30
-                        )
-                    ) {
+                    // jedna strana
+                    if (!collideWithWalls(try1X, try1Y, 30)) {
 
                         e.x = try1X;
                         e.y = try1Y;
                     }
 
-                    else if (
-                        !collideWithWalls(
-                            try2X,
-                            try2Y,
-                            30
-                        )
-                    ) {
+                    // druhá strana
+                    else if (!collideWithWalls(try2X, try2Y, 30)) {
 
                         e.x = try2X;
                         e.y = try2Y;
@@ -1016,43 +974,43 @@ if (seesPlayer) {
                 }
             }
 
-            // ENERGY SWORD
-            if (rankData.melee) {
 
-                if (realDist < rankData.meleeRange) {
+            // ENERGY SWORD ATTACK
+if (rankData.melee) {
 
-                    player.hp = 0;
+    let realDx = player.x - e.x;
+    let realDy = player.y - e.y;
 
-                    player.lastHitTime =
-                        Date.now();
+    let realDist = Math.sqrt(
+        realDx * realDx +
+        realDy * realDy
+    );
 
-                    return;
-                }
-            }
+    if (realDist < rankData.meleeRange) {
 
-            let shootDist = 480;
+        player.hp = 0;
 
-// ak bol enemy zasiahnutý
-if (e.agro > 0) {
+        player.lastHitTime = Date.now();
 
-    shootDist = 99999;
+        return;
+    }
 }
 
-            // STREĽBA
+            // streľba
             e.cooldown -= delta;
 
-            if (
-                !rankData.melee &&
-                e.cooldown <= 0 &&
-                seesPlayer &&
-    realDist < shootDist          //vzdialenost
-            ) {
+if (
+    !rankData.melee &&
+    e.cooldown <= 0 &&
+    dist < 500
+) {
 
                 let angle = Math.atan2(
                     player.y - e.y,
                     player.x - e.x
                 );
 
+                // nepresnosť
                 angle +=
                     (Math.random() - 0.5)
                     * rankData.accuracy;
@@ -1062,13 +1020,8 @@ if (e.agro > 0) {
                     x: e.x,
                     y: e.y,
 
-                    dx:
-                        Math.cos(angle)
-                        * rankData.bulletSpeed,
-
-                    dy:
-                        Math.sin(angle)
-                        * rankData.bulletSpeed,
+                    dx: Math.cos(angle) * rankData.bulletSpeed,
+                    dy: Math.sin(angle) * rankData.bulletSpeed,
 
                     size: 5,
 
@@ -1076,14 +1029,19 @@ if (e.agro > 0) {
 
                     enemyType: e.type,
 
-                    life: 140   //140 bolo
+                    life: 1000
                 });
 
+
+
+                // elite strieľa rýchlejšie
                 e.cooldown =
                     (80 + Math.random() * 25)
                     * rankData.fireRate
                     * diff.enemyFireRate;
             }
+
+
         }
     });
 }

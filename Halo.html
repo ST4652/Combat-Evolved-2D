@@ -38,25 +38,17 @@
 
 
 
-
-
-
-
-
-
         let walls = [
 
-            // cliff edge
-            { x: 0, y: -600, w: 1280, h: 600, texture: "rock" },//vrch velke
-            { x: 1280, y: -600, w: 1280, h: 680, texture: "rock" },
-            { x: 2560, y: -600, w: 1280, h: 680, texture: "rock" },
+            { x: 0, y: -600, w: 4600, h: 600, texture: "rock" },//vrch velke
+            // { x: 1280, y: -600, w: 1280, h: 680, texture: "rock" },
+            // { x: 2560, y: -600, w: 1280, h: 680, texture: "rock" },
 
 
-            { x: -1000, y: -600, w: 1000, h: 1280, texture: "rock" },//lave velke
-            { x: -1000, y: 680, w: 1000, h: 1280, texture: "rock" },
+            { x: -1000, y: -600, w: 1000, h: 2400, texture: "rock" },//lave velke
 
 
-            { x: 0, y: 0, w: 800, h: 40, texture: "rock" },//prvy riadok od vrchu zlavej strany
+            { x: 0, y: 0, w: 4000, h: 40, texture: "rock" },//prvy riadok od vrchu zlavej strany
             { x: 0, y: 40, w: 680, h: 40, texture: "rock" },
             { x: 0, y: 80, w: 560, h: 40, texture: "rock" },
             { x: 0, y: 120, w: 480, h: 40, texture: "rock" },
@@ -75,7 +67,7 @@
             { x: 0, y: 960, w: 560, h: 40, texture: "rock" },
             { x: 0, y: 1000, w: 640, h: 40, texture: "rock" },
             { x: 0, y: 1040, w: 840, h: 40, texture: "rock" },
-            { x: 0, y: 1080, w: 2280, h: 1600, texture: "rock" },
+            { x: 0, y: 1080, w: 2280, h: 2400, texture: "rock" },
             { x: 1040, y: 1000, w: 1200, h: 120, texture: "rock" },//spodny napravo
             { x: 1000, y: 920, w: 1200, h: 80, texture: "rock" },
             { x: 920, y: 840, w: 1240, h: 80, texture: "rock" },
@@ -92,7 +84,8 @@
             { x: 1240, y: 40, w: 2500, h: 40, texture: "rock" },
             { x: 1640, y: 80, w: 880, h: 80, texture: "rock" }, //najnizsie hore
 
-            { x: 2840, y: 80, w: 880, h: 40, texture: "rock" }, //prvy napravo odhora
+            { x: 2840, y: 40, w: 1000, h: 80, texture: "rock" }, //prvy napravo odhora
+            { x: 3840, y: 0, w: 1200, h: 2120, texture: "rock" }, //vypln velka
             { x: 2960, y: 120, w: 880, h: 80, texture: "rock" },
             { x: 3000, y: 200, w: 880, h: 160, texture: "rock" },
             { x: 3040, y: 360, w: 880, h: 120, texture: "rock" },
@@ -104,11 +97,11 @@
             { x: 3240, y: 680, w: 880, h: 120, texture: "rock" },
             { x: 3280, y: 760, w: 880, h: 280, texture: "rock" },
             { x: 3320, y: 1040, w: 880, h: 40, texture: "rock" },
-            { x: 3360, y: 1080, w: 880, h: 280, texture: "rock" },
+            { x: 3360, y: 1080, w: 880, h: 280, texture: "rock" },//preliacina dovnutra akokeby v stene, 
             { x: 3320, y: 1360, w: 880, h: 80, texture: "rock" },
             { x: 3240, y: 1440, w: 880, h: 40, texture: "rock" },
             { x: 3040, y: 1480, w: 880, h: 80, texture: "rock" },
-            { x: 3000, y: 1560, w: 880, h: 120, texture: "rock" },
+            { x: 3000, y: 1560, w: 880, h: 120, texture: "rock" },//najviac nalavo, nad tou stenou
             { x: 3080, y: 1680, w: 880, h: 80, texture: "rock" },
             { x: 3200, y: 1760, w: 680, h: 40, texture: "rock" },
             { x: 3480, y: 1800, w: 680, h: 40, texture: "rock" },
@@ -117,13 +110,40 @@
             { x: 3680, y: 2000, w: 680, h: 80, texture: "rock" },
             { x: 3800, y: 2080, w: 680, h: 40, texture: "rock" },
             { x: 4200, y: 2120, w: 680, h: 80, texture: "rock" },
+            { x: 4800, y: 2120, w: 2000, h: 800, texture: "rock" },//velka vypln
             { x: 4240, y: 2200, w: 680, h: 40, texture: "rock" },
             { x: 4280, y: 2240, w: 680, h: 120, texture: "rock" },
             { x: 4320, y: 2360, w: 680, h: 240, texture: "rock" },
             { x: 4360, y: 2600, w: 680, h: 80, texture: "rock" },
             { x: 4400, y: 2640, w: 680, h: 80, texture: "rock" },
             { x: 4480, y: 2680, w: 680, h: 80, texture: "rock" },
-            { x: 4520, y: 2760, w: 680, h: 80, texture: "rock" },
+            { x: 4520, y: 2760, w: 680, h: 80, texture: "rock" },//ten roh nad a trocha nalavo u zealota 80x80
+            { x: 4720, y: 2840, w: 680, h: 40, texture: "rock" },
+            { x: 4800, y: 2880, w: 680, h: 40, texture: "rock" },
+            { x: 4800, y: 2880, w: 2000, h: 40, texture: "rock" },
+            { x: 5040, y: 2920, w: 2000, h: 40, texture: "rock" },
+            { x: 5160, y: 2960, w: 2000, h: 40, texture: "rock" },
+            { x: 5400, y: 3000, w: 2000, h: 40, texture: "rock" },
+            { x: 5640, y: 3080, w: 2000, h: 40, texture: "rock" },
+            { x: 5600, y: 3040, w: 2000, h: 40, texture: "rock" },
+            { x: 5680, y: 3120, w: 2000, h: 80, texture: "rock" },
+            { x: 5720, y: 3200, w: 2000, h: 40, texture: "rock" },
+            { x: 5800, y: 3240, w: 2000, h: 40, texture: "rock" },
+            { x: 6040, y: 3280, w: 2000, h: 40, texture: "rock" },
+            { x: 6080, y: 3320, w: 2000, h: 120, texture: "rock" },
+            { x: 6160, y: 3440, w: 2000, h: 40, texture: "rock" },
+            { x: 6400, y: 3480, w: 200, h: 40, texture: "rock" },//spodne co je siroke 200, uplne na konci
+
+
+            { x: 5080, y: 3280, w: 200, h: 40, texture: "rock" },//kamen v poslednej casti
+            { x: 5040, y: 3320, w: 320, h: 40, texture: "rock" },
+            { x: 4960, y: 3360, w: 480, h: 40, texture: "rock" },
+            { x: 4920, y: 3400, w: 600, h: 80, texture: "rock" },
+            { x: 5000, y: 3480, w: 600, h: 40, texture: "rock" },
+            { x: 5120, y: 3520, w: 520, h: 40, texture: "rock" },
+            { x: 5240, y: 3560, w: 320, h: 40, texture: "rock" },
+
+
             //...
 
 
@@ -155,11 +175,35 @@
             { x: 3040, y: 3080, w: 280, h: 80, texture: "rock" },
             { x: 3040, y: 3160, w: 1600, h: 1600, texture: "rock" },
 
-            { x: 3520, y: 3120, w: 800, h: 40, texture: "rock" },//prve co zprava je od spodu myslene
-            { x: 3520, y: 3120, w: 800, h: 40, texture: "rock" },
-            { x: 3640, y: 3080, w: 800, h: 40, texture: "rock" },
+            { x: 3520, y: 3120, w: 1240, h: 40, texture: "rock" },//prve co zprava je od spodu myslene
+            { x: 3640, y: 3080, w: 1040, h: 40, texture: "rock" },
             { x: 3800, y: 3000, w: 800, h: 80, texture: "rock" },
             { x: 4000, y: 2960, w: 400, h: 40, texture: "rock" },
+            { x: 4640, y: 3160, w: 160, h: 120, texture: "rock" },//nalavo stena druhej casti, 4 od vrchu,vlavo pod zealotom
+            { x: 4640, y: 3280, w: 120, h: 80, texture: "rock" },
+            { x: 4600, y: 3360, w: 120, h: 240, texture: "rock" },
+            { x: 4600, y: 3360, w: 120, h: 240, texture: "rock" },
+            { x: 4640, y: 3600, w: 120, h: 160, texture: "rock" },
+            { x: 4640, y: 3760, w: 160, h: 80, texture: "rock" },
+            { x: 4640, y: 3840, w: 240, h: 80, texture: "rock" },
+            { x: 4640, y: 3920, w: 520, h: 40, texture: "rock" },
+            { x: 4640, y: 3960, w: 720, h: 40, texture: "rock" },
+            { x: 4640, y: 4000, w: 3000, h: 1280, texture: "rock" },//spodne(velke)
+            { x: 5680, y: 3960, w: 2000, h: 40, texture: "rock" },//dole vpravo, prve od spodu
+            { x: 5840, y: 3920, w: 2000, h: 40, texture: "rock" },
+            { x: 5920, y: 3880, w: 2000, h: 40, texture: "rock" },
+            { x: 5960, y: 3840, w: 2000, h: 40, texture: "rock" },
+            { x: 6040, y: 3800, w: 2000, h: 40, texture: "rock" },
+            { x: 6080, y: 3720, w: 2000, h: 80, texture: "rock" },
+            { x: 6160, y: 3680, w: 200, h: 40, texture: "rock" },//taky maly vystupok na konci hore na spodnej strane
+            { x: 6600, y: 3680, w: 2000, h: 40, texture: "rock" },
+
+
+
+
+
+
+
 
             { x: 2600, y: 1900, w: 100, h: 120, texture: "rock" },//suter
             { x: 2700, y: 1940, w: 40, h: 80, texture: "rock" },
@@ -178,7 +222,7 @@
             { x: 3480, y: 2640, w: 440, h: 40, texture: "rock" },
             { x: 3560, y: 2680, w: 320, h: 40, texture: "rock" },
             { x: 3640, y: 2720, w: 160, h: 40, texture: "rock" },
-            { x: 3440, y: 2920, w: 160, h: 40, texture: "rock" },
+            { x: 3440, y: 2920, w: 160, h: 40, texture: "rock" },//maly kamen
             { x: 3540, y: 2880, w: 60, h: 40, texture: "rock" },
 
 
@@ -228,20 +272,28 @@
             { x: 4000, y: 2700, type: "grunt", rank: "minor", cooldown: 0, section: 3 },
             { x: 4150, y: 2600, type: "grunt", rank: "major", cooldown: 0, section: 3 },
 
-            { x: 4800, y: 2900, type: "elite", rank: "zealot", cooldown: 0, section: 4 },
+            { x: 4800, y: 3000, type: "elite", rank: "zealot", cooldown: 0, section: 4 },
+
+            { x: 4800, y: 3600, type: "elite", rank: "major", cooldown: 0, section: 5 },
+            { x: 4840, y: 3500, type: "grunt", rank: "minor", cooldown: 0, section: 5 },
+            { x: 4900, y: 3580, type: "grunt", rank: "minor", cooldown: 0, section: 5 },
+
+            { x: 5120, y: 3080, type: "grunt", rank: "minor", cooldown: 0, section: 5 },
+            { x: 5160, y: 3160, type: "grunt", rank: "minor", cooldown: 0, section: 5 },
+
+            { x: 5800, y: 3600, type: "grunt", rank: "minor", cooldown: 0, section: 5 },
+            { x: 5900, y: 3660, type: "grunt", rank: "minor", cooldown: 0, section: 5 },
+            { x: 5850, y: 3540, type: "grunt", rank: "major", cooldown: 0, section: 5 },
 
 
 
-
-
-
-/*
-            //toto ti co su na zacitaku
-            { x: 150, y: 10, type: "grunt", rank: "minor", cooldown: 0, section: 99 },
-            { x: 200, y: 10, type: "grunt", rank: "major", cooldown: 0, section: 99 },
-            { x: 250, y: 10, type: "elite", rank: "minor", cooldown: 0, section: 99 },
-            { x: 300, y: 10, type: "elite", rank: "major", cooldown: 0, section: 99 },
-            { x: 350, y: 10, type: "elite", rank: "zealot", cooldown: 0, section: 99 },   // 350 10*/
+            /*
+                        //toto ti co su na zacitaku
+                        { x: 150, y: 10, type: "grunt", rank: "minor", cooldown: 0, section: 99 },
+                        { x: 200, y: 10, type: "grunt", rank: "major", cooldown: 0, section: 99 },
+                        { x: 250, y: 10, type: "elite", rank: "minor", cooldown: 0, section: 99 },
+                        { x: 300, y: 10, type: "elite", rank: "major", cooldown: 0, section: 99 },
+                        { x: 350, y: 10, type: "elite", rank: "zealot", cooldown: 0, section: 99 },   // 350 10*/
         ];
 
 
@@ -289,8 +341,7 @@
 
                 activated: false
             },
-
-                        {
+            {
                 x: 4300,
                 y: 2840,
 
@@ -303,9 +354,22 @@
 
                 activated: false
             },
+            {
+                x: 4700,
+                y: 3020,
+
+                spawnX: 4700,
+                spawnY: 3020,
+
+                section: 5,
+
+                requiredSection: 4,
+
+                activated: false
+            },
 
 
-           
+
         ];
 
         let currentCheckpoint = {
@@ -338,7 +402,7 @@
                     player.y - cp.y
                 );
 
-                if (dist < 120) {      //TOTO MENIT JAK TAK XXXXXXXXXXXXXXXXXX
+                if (dist < 200) {      //TOTO MENIT JAK TAK XXXXXXXXXXXXXXXXXX
 
 
                     cp.activated = true;
@@ -367,7 +431,7 @@
         // exit
         /////////////
 
-        let exitZone = { x: 1460, y: 2710, w: 440, h: 200 }
+        let exitZone = { x: 6300, y: 3310, w: 440, h: 400 }
 
         let fading = false;
         let fadeAlpha = 0;
@@ -425,28 +489,28 @@
 
                     ctx.save();
 
-ctx.scale(TEXTURE_SCALE, TEXTURE_SCALE);
+                    ctx.scale(TEXTURE_SCALE, TEXTURE_SCALE);
 
-let pattern =
-    ctx.createPattern(img, "repeat");
+                    let pattern =
+                        ctx.createPattern(img, "repeat");
 
-ctx.translate(
-    -offset.x / TEXTURE_SCALE,
-    -offset.y / TEXTURE_SCALE
-);
+                    ctx.translate(
+                        -offset.x / TEXTURE_SCALE,
+                        -offset.y / TEXTURE_SCALE
+                    );
 
-ctx.fillStyle = pattern;
+                    ctx.fillStyle = pattern;
 
-ctx.fillRect(
+                    ctx.fillRect(
 
-    f.x / TEXTURE_SCALE,
-    f.y / TEXTURE_SCALE,
+                        f.x / TEXTURE_SCALE,
+                        f.y / TEXTURE_SCALE,
 
-    f.w / TEXTURE_SCALE,
-    f.h / TEXTURE_SCALE
-);
+                        f.w / TEXTURE_SCALE,
+                        f.h / TEXTURE_SCALE
+                    );
 
-ctx.restore();
+                    ctx.restore();
                 }
 
                 // MALÉ TILE TEXTÚRY
@@ -579,6 +643,18 @@ ctx.restore();
                 }
             });
         }
+
+        function updateFade() {
+
+    if (fading) {
+
+        fadeAlpha += 0.01;
+
+        if (fadeAlpha >= 1) {
+            window.location.href = "TaR1.html";
+        }
+    }
+}
 
         function drawEnemies(offset) {
             let enemySize = 72;
