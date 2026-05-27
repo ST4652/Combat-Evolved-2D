@@ -35,6 +35,8 @@
 
 
 
+
+
         // TERRAIN TEXTURY
         const grassTile = new Image();
         grassTile.src = "trava 2400x2400.png";     //v14 final
@@ -56,26 +58,9 @@
         rockBigTile.src = "kamen 1280x1280.png";
 
         const grassBig = new Image();
-        grassBig.src = "trava 2400x2400.png";
-
-        const podlahaBig = new Image();
-        podlahaBig.src = "trava TaR podlaha big.png";
+        grassBig.src = "TaR2 podlaha v11.png";
 
 
-
-
-
-
-
-        // DEKORÁCIE TEXTÚRY
-        const paskahImg = new Image();
-        paskahImg.src = "paskah.png";
-
-        const paskavImg = new Image();
-        paskavImg.src = "paskav.png";
-
-        const stromImg = new Image();
-        stromImg.src = "strom.png";
 
         ///////////////////
         // WALLS
@@ -84,27 +69,74 @@
 
 
         let walls = [
-            { x: 0, y: 0, w: 120, h: 40, texture: "rock" },
-            { x: 0, y: 40, w: 80, h: 40, texture: "rock" },
+            //prva miestnost
+            { x: -110, y: -10, w: 820, h: 20, },//horne
+            { x: -110, y: -10, w: 20, h: 820, },//lave
+            { x: 690, y: -10, w: 20, h: 320, },
+            { x: 690, y: 490, w: 20, h: 320, },
+            { x: -110, y: 790, w: 820, h: 20, },//dolne
+            //chodba mezdi prvou a druhou
+            { x: 690, y: 290, w: 420, h: 20, },
+            { x: 690, y: 490, w: 620, h: 20, },
 
-            //marek tuto steny vytvaruj do toho tvaru co som ti psolal minule
-            //potom porozmiestnuj enemy ktory su o par raidkov nizsie v let enemies tak nejako mudro ako su aj inde
-//checkpointy radsej nerob bo to len dokazis a nic ine nepridavaj
-//nic s nabojmi nerob bo su dobre a stratis cas so zbytpcnimi vecami
-//zvuky amt nebudeme, rano ich asi odstranim ale ak toronit TaR1(toto) tak mozes lebo mame napisane v specifikacii ze budu
-//picisko
-//a ze sa enemy nehybu je naschval a nehaj to tak
+            { x: 1090, y: -10, w: 20, h: 320, },
+            { x: 1290, y: 190, w: 20, h: 320, },
+
+            { x: 1090, y: -10, w: 620, h: 20, },
+            { x: 1290, y: 190, w: 420, h: 20, },
+            //druha miestnost
+            { x: 1690, y: -110, w: 1420, h: 20, },//horne
+            { x: 3090, y: -110, w: 20, h: 1820, },//prave
+            { x: 1690, y: -110, w: 20, h: 120, },//lave vrch
+            { x: 1690, y: 190, w: 20, h: 1520, },//lave
+            { x: 1690, y: 1690, w: 1120, h: 20, },//dolne
+            { x: 2990, y: 1690, w: 120, h: 20, },//dolne prave
+
+            { x: 2100, y: 250, w: 580, h: 100, }, //velke tamto
+            { x: 2000, y: 650, w: 780, h: 300, }, //velke tamto
+            { x: 2000, y: 1300, w: 150, h: 150, },
+            { x: 2325, y: 1300, w: 150, h: 150, },
+            { x: 2650, y: 1300, w: 150, h: 150, },
+
+
+
+            //chodba
+            { x: 2790, y: 1690, w: 20, h: 520, },//lava
+            { x: 2990, y: 1690, w: 20, h: 320, },
+
+            { x: 2790, y: 2190, w: 3000, h: 20, },
+            { x: 2990, y: 1990, w: 2000, h: 20, },
+
+
+
+
+
+
+
+
+
+
+
+
         ];
 
 
-
-        let decorations = [
+                let decorations = [
 
         ];
 
 
         let floors = [     //pouzivat meno textury + big !!!!!!!
-            { x: 0, y: 0, w: 10000, h: 6000, texture: "grassBig" },
+            { x: -100, y: 0, w: 800, h: 800, texture: "grassBig" },
+
+            { x: 700, y: 300, w: 600, h: 200, texture: "grassBig" },
+            { x: 700, y: 300, w: 600, h: 200, texture: "grassBig" },
+            { x: 1100, y: 0, w: 600, h: 200, texture: "grassBig" },
+            { x: 1100, y: 0, w: 200, h: 500, texture: "grassBig" },
+
+            { x: 1700, y: -100, w: 1400, h: 1800, texture: "grassBig" },
+            { x: 2800, y: 1700, w: 200, h: 500, texture: "grassBig" },
+            { x: 2800, y: 2000, w: 3000, h: 200, texture: "grassBig" },
 
 
         ];
@@ -117,11 +149,44 @@
         //////////////////////////
         let enemies = [
 
-            { x: 150, y: 10, type: "grunt", rank: "minor", cooldown: 0, section: 99 },
-            { x: 200, y: 10, type: "grunt", rank: "major", cooldown: 0, section: 99 },
-            { x: 250, y: 10, type: "elite", rank: "minor", cooldown: 0, section: 99 },
-            { x: 300, y: 10, type: "elite", rank: "major", cooldown: 0, section: 99 },
+
+            { x: 0, y: 50, type: "grunt", rank: "minor", cooldown: 150, section: 1 },
+            { x: 650, y: 650, type: "grunt", rank: "minor", cooldown: 150, section: 1 },
+            { x: 600, y: 700, type: "grunt", rank: "minor", cooldown: 150, section: 1 },
+            //chodba medzi 1 a 2
+            { x: 1500, y: 100, type: "elite", rank: "zealot", cooldown: 0, section: 2 },
+            //druha miestnost
+            { x: 2300, y: 100, type: "elite", rank: "major", cooldown: 0, section: 3 },
+            { x: 2250, y: 150, type: "grunt", rank: "major", cooldown: 0, section: 3 },
+            { x: 2200, y: 100, type: "grunt", rank: "minor", cooldown: 0, section: 3 },
+            { x: 2370, y: 130, type: "grunt", rank: "minor", cooldown: 0, section: 3 },
+
+            { x: 1800, y: 900, type: "elite", rank: "major", cooldown: 0, section: 3 },
+            { x: 1840, y: 850, type: "elite", rank: "minor", cooldown: 0, section: 3 },
+
+            { x: 2900, y: 850, type: "grunt", rank: "minor", cooldown: 0, section: 3 },
+            { x: 2950, y: 900, type: "grunt", rank: "minor", cooldown: 0, section: 3 },
+            { x: 2980, y: 740, type: "grunt", rank: "minor", cooldown: 0, section: 3 },
+
+            { x: 1800, y: 1600, type: "elite", rank: "minor", cooldown: 0, section: 3 },
+
+            { x: 2900, y: 1600, type: "elite", rank: "major", cooldown: 0, section: 3 },
+            { x: 2800, y: 1600, type: "grunt", rank: "minor", cooldown: 0, section: 3 },
+
+            { x: 2900, y: 2050, type: "elite", rank: "minor", cooldown: 0, section: 4 },
+            { x: 2950, y: 2150, type: "elite", rank: "minor", cooldown: 0, section: 4 },
+
+
+            { x: 3700, y: 2100, type: "elite", rank: "zealot", cooldown: 0, section: 5 },
+
+
         ];
+
+
+
+
+
+
 
 
         /////////
@@ -142,57 +207,37 @@
         let checkpoints = [
 
             {
-                x: 2300,
-                y: 260,
+                x: 950,
+                y: 400,
 
-                spawnX: 2300,
-                spawnY: 260,
+                spawnX: 500,
+                spawnY: 400,
 
                 section: 2,
 
                 requiredSection: 1,
 
                 activated: false,
-
             },
+
             {
-                x: 2870,
-                y: 1800,
-
-                spawnX: 2870,
-                spawnY: 1800,
-
+                x: 1500,
+                y: 100,
+                spawnX: 1500,
+                spawnY: 100,
                 section: 3,
-
                 requiredSection: 2,
-
-                activated: false
+                activated: false,
             },
+
             {
-                x: 4300,
-                y: 2840,
-
-                spawnX: 3900,
-                spawnY: 2800,
-
+                x: 2800,
+                y: 1550,
+                spawnX: 2800,
+                spawnY: 1550,
                 section: 4,
-
                 requiredSection: 3,
-
-                activated: false
-            },
-            {
-                x: 4700,
-                y: 3020,
-
-                spawnX: 4700,
-                spawnY: 3020,
-
-                section: 5,
-
-                requiredSection: 4,
-
-                activated: false
+                activated: false,
             },
 
 
@@ -258,7 +303,7 @@
         // exit
         /////////////
 
-        let exitZone = { x: 6300, y: 3310, w: 440, h: 400 }
+        let exitZone = { x: 3700, y: 1900, w: 400, h: 400 }
 
         let fading = false;
         let fadeAlpha = 0;
@@ -275,7 +320,7 @@
         //////////////////////////
         function drawBackground(offset) {
 
-            ctx.fillStyle = "#222";
+            ctx.fillStyle = "#281843";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             floors.forEach(f => {
@@ -459,7 +504,7 @@
                 // fallback bez textúry
                 else {
 
-                    ctx.fillStyle = "#555";
+                    ctx.fillStyle = "#221133";
 
                     ctx.fillRect(
                         w.x - offset.x,
@@ -522,7 +567,9 @@
         }
 
 
-        function drawDecorations(offset) {
+
+
+         function drawDecorations(offset) {
 
             decorations.forEach(d => {
 
@@ -551,7 +598,6 @@
                 );
             });
         }
-
 
         function drawBullets(offset) {
             bullets.forEach(b => {

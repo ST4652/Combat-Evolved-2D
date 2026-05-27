@@ -32,6 +32,51 @@
 
         ctx.imageSmoothingEnabled = false;
 
+
+
+
+        // TERRAIN TEXTURY
+        const grassTile = new Image();
+        grassTile.src = "trava 2400x2400.png";     //v14 final
+
+        const mostTile = new Image();
+        mostTile.src = "most v9.png";       //potom most v9.png
+
+        const dirtTile = new Image();
+        dirtTile.src = "elite red 16x16 v2.png";
+
+        const rockTile = new Image();
+        rockTile.src = "kamen v3.png";    //v3 finalny alebo v7
+
+        const podlahaTile = new Image();
+        podlahaTile.src = "TaR podlaha v2.png";    //v3 finalny alebo v7
+
+
+        const rockBigTile = new Image();
+        rockBigTile.src = "kamen 1280x1280.png";
+
+        const grassBig = new Image();
+        grassBig.src = "trava 2400x2400.png";
+
+        const podlahaBig = new Image();
+        podlahaBig.src = "trava TaR podlaha big.png";
+
+
+
+
+
+
+
+        // DEKORÁCIE TEXTÚRY
+        const paskahImg = new Image();
+        paskahImg.src = "paskah.png";
+
+        const paskavImg = new Image();
+        paskavImg.src = "paskav.png";
+
+        const stromImg = new Image();
+        stromImg.src = "strom.png";
+
         ///////////////////
         // WALLS
         //////////////////
@@ -228,6 +273,18 @@
 
 
 
+
+        ];
+
+
+
+        let decorations = [
+
+
+            { x: 2150, y: 900, w: 220, h: 200, texture: "strom" },
+            { x: 2500, y: 2100, w: 220, h: 200, texture: "strom" },
+            { x: 4000, y: 2200, w: 220, h: 200, texture: "strom" },
+            { x: 5000, y: 3800, w: 220, h: 200, texture: "strom" },
 
         ];
 
@@ -646,15 +703,15 @@
 
         function updateFade() {
 
-    if (fading) {
+            if (fading) {
 
-        fadeAlpha += 0.01;
+                fadeAlpha += 0.01;
 
-        if (fadeAlpha >= 1) {
-            window.location.href = "TaR1.html";
+                if (fadeAlpha >= 1) {
+                    window.location.href = "TaR1.html";
+                }
+            }
         }
-    }
-}
 
         function drawEnemies(offset) {
             let enemySize = 72;
@@ -693,6 +750,38 @@
                 ctx.restore();
             });
         }
+
+
+        function drawDecorations(offset) {
+
+            decorations.forEach(d => {
+
+                let img;
+
+                // vyber textúry
+                if (d.texture === "strom") {
+                    img = stromImg;
+                }
+
+                else if (d.texture === "paskav") {
+                    img = paskavImg;
+                }
+
+                else if (d.texture === "paskah") {
+                    img = paskahImg;
+                }
+
+                // draw
+                ctx.drawImage(
+                    img,
+                    d.x - offset.x,
+                    d.y - offset.y,
+                    d.w,
+                    d.h
+                );
+            });
+        }
+
 
         function drawBullets(offset) {
             bullets.forEach(b => {

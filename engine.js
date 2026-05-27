@@ -1,7 +1,7 @@
 let difficulty =
-  localStorage.getItem("difficulty") ||
-   // "test";
-    "legendary";
+ // localStorage.getItem("difficulty") ||
+    "test";
+ // "legendary";
 let gameSpeed = 1.6;    //1.4   skor 1.75
 
 
@@ -36,27 +36,7 @@ eliteZealotImg.src = "elite zealot v3.png";
 
 
 
-// TERRAIN TEXTURY
-const grassTile = new Image();
-grassTile.src = "trava 2400x2400.png";     //v14 final
 
-const mostTile = new Image();
-mostTile.src = "most v9.png";       //potom most v9.png
-
-const dirtTile = new Image();
-dirtTile.src = "elite red 16x16 v2.png";
-
-const rockTile = new Image();
-rockTile.src = "kamen v3.png";    //v3 finalny alebo v7
-
-
-
-
-const rockBigTile = new Image();
-rockBigTile.src = "kamen 1280x1280.png";
-
-const grassBig = new Image();
-grassBig.src = "trava 2400x2400.png";
 
 
 const TEXTURE_SCALE = 1.25;
@@ -290,7 +270,7 @@ let player = {
     x: 500,        //500 obidve      //naposledy na Halo 2600,1600
     y: 500,
     size: 80,
-    speed: 2.5,     //2.0 dat potom   2.5 po novom zevraj
+    speed: 10.5,     //2.0 dat potom   2.5 po novom zevraj
     angle: 0,
 
     hp: diff.playerHp,     //70bolo
@@ -304,7 +284,9 @@ let player = {
         ar: 36
     },
     reloading: false,
+      reloadTimer: 0,
     lastShot: 0,
+  
 };
 
 
@@ -361,17 +343,19 @@ function gameLoop(timestamp) {
 
     checkCollisions();
 
-    regenerateHp();
+regenerateHp(delta);
 
     checkLevelEnd();
 
     let offset = getOffset();
 
     drawBackground(offset);
+    drawDecorations(offset);
     drawWalls(offset);
     drawCorpses(offset);
     drawBlood(offset);
     drawEnemies(offset);
+    updateReload(delta);
     drawBullets(offset);
     drawPlayer();
     drawHP();
@@ -397,15 +381,16 @@ requestAnimationFrame(gameLoop);
 
 
 //regeneracia zivotov
-function regenerateHp() {
+function regenerateHp(delta) {
 
-    // 3 sekundy bez damage
+    // delay po damage
     if (Date.now() - player.lastHitTime > diff.regenDelay) {
 
-        player.hp += diff.regenSpeed;
+        player.hp += diff.regenSpeed * delta;
 
-        // max hp limit
+        // clamp
         if (player.hp > player.maxHp) {
+
             player.hp = player.maxHp;
         }
     }
@@ -556,32 +541,14 @@ function reloadWeapon() {
 
     player.reloading = true;
 
+    player.reloadTimer =
+        weapons[player.weapon].reloadTime;
+
     arLoopSound.pause();
 
     arLoopSound.currentTime = 0;
 
     arSoundPlaying = false;
-
-    setTimeout(() => {
-
-        player.ammo[player.weapon] =
-            weapons[player.weapon].magSize;
-
-        player.reloading = false;
-        // znovu spusti AR zvuk ak hráč stále drží myš
-if (
-    mouseDown &&
-    player.weapon === "ar"
-) {
-
-    arLoopSound.currentTime = 0;
-
-    arLoopSound.play();
-
-    arSoundPlaying = true;
-}
-
-    }, weapons[player.weapon].reloadTime);
 }
 
 
@@ -615,6 +582,38 @@ document.addEventListener("keydown", e => {
         reloadWeapon();
     }
 });
+
+
+
+function updateReload(delta) {
+
+    if (!player.reloading) return;
+
+    // delta -> približne ms
+    player.reloadTimer -= 16.67 * delta;
+
+    if (player.reloadTimer <= 0) {
+
+        player.ammo[player.weapon] =
+            weapons[player.weapon].magSize;
+
+        player.reloading = false;
+
+        // znovu pustí AR zvuk
+        if (
+            mouseDown &&
+            player.weapon === "ar"
+        ) {
+
+            arLoopSound.currentTime = 0;
+
+            arLoopSound.play();
+
+            arSoundPlaying = true;
+        }
+    }
+}
+
 
 
 ////////////
