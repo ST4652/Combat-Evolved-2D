@@ -1,7 +1,7 @@
 let difficulty =
- // localStorage.getItem("difficulty") ||
-    "test";
- // "legendary";
+ localStorage.getItem("difficulty") ||
+  //  "test";
+ "legendary";
 let gameSpeed = 1.6;    //1.4   skor 1.75
 
 
@@ -270,7 +270,7 @@ let player = {
     x: 500,        //500 obidve      //naposledy na Halo 2600,1600
     y: 500,
     size: 80,
-    speed: 10.5,     //2.0 dat potom   2.5 po novom zevraj
+    speed: 2.5,     //2.0 dat potom   2.5 po novom zevraj
     angle: 0,
 
     hp: diff.playerHp,     //70bolo
