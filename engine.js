@@ -1,8 +1,8 @@
 let difficulty =
- localStorage.getItem("difficulty") ||
-  //  "test";
- "legendary";
-let gameSpeed = 1.6;    //1.4   skor 1.75
+    localStorage.getItem("difficulty") ||
+    "test";
+//"legendary";
+let gameSpeed = 1.6;    //1.4   skor 1.75    1.6 teda nakoniec
 
 
 
@@ -11,7 +11,7 @@ let gameSpeed = 1.6;    //1.4   skor 1.75
 
 
 //////////////////////////
-// TEXTÚRY
+// TEXTURY
 //////////////////////////
 const dmrPlayerImg = new Image();
 dmrPlayerImg.src = "masta chief dmr v2.png";
@@ -284,9 +284,9 @@ let player = {
         ar: 36
     },
     reloading: false,
-      reloadTimer: 0,
+    reloadTimer: 0,
     lastShot: 0,
-  
+
 };
 
 
@@ -343,7 +343,7 @@ function gameLoop(timestamp) {
 
     checkCollisions();
 
-regenerateHp(delta);
+    regenerateHp(delta);
 
     checkLevelEnd();
 
@@ -490,17 +490,17 @@ function shoot() {
     player.ammo[player.weapon]--;
 
     //////////////////////////
-// ZVUKY STREĽBY
-//////////////////////////
+    // ZVUKY STREĽBY
+    //////////////////////////
 
-if (player.weapon === "dmr") {
+    if (player.weapon === "dmr") {
 
-    let s = dmrShotSound.cloneNode();
+        let s = dmrShotSound.cloneNode();
 
-    s.volume = 0.6;
+        s.volume = 0.6;
 
-    s.play();
-}
+        s.play();
+    }
 
     let angle = Math.atan2(
         mouse.y - canvas.height / 2,
@@ -559,17 +559,17 @@ function reloadWeapon() {
 
 document.addEventListener("keydown", e => {
 
-if (e.key === "+") {
+    if (e.code === "Digit1") {
 
-    player.weapon = "dmr";
+        player.weapon = "dmr";
 
-    arLoopSound.pause();
-arLoopSound.currentTime = 0.1;
+        arLoopSound.pause();
+        arLoopSound.currentTime = 0.1;
 
-    arSoundPlaying = false;
-}
+        arSoundPlaying = false;
+    }
 
-    if (e.key === "ľ") {
+    if (e.code === "Digit2") {
 
         player.weapon = "ar";
 
@@ -906,11 +906,11 @@ function updateBullets(delta) {
 
 function updateEnemies(delta) {
 
-enemies.forEach(e => {
+    enemies.forEach(e => {
 
-    if (!e.angle) e.angle = 0;
+        if (!e.angle) e.angle = 0;
 
-    if (!e.agro) e.agro = 0;
+        if (!e.agro) e.agro = 0;
 
         if (e.agro > 0) {
             e.agro--;
@@ -934,8 +934,8 @@ enemies.forEach(e => {
         let stopDist = (e.type === "grunt") ? 170 : 210;
 
         if (e.rank === "zealot") {
-    stopDist = 0;
-}
+            stopDist = 0;
+        }
 
         // enemy AI variables
         if (!e.strafeDir) e.strafeDir = 1;
@@ -1051,34 +1051,34 @@ enemies.forEach(e => {
 
 
             // ENERGY SWORD ATTACK
-if (rankData.melee) {
+            if (rankData.melee) {
 
-    let realDx = player.x - e.x;
-    let realDy = player.y - e.y;
+                let realDx = player.x - e.x;
+                let realDy = player.y - e.y;
 
-    let realDist = Math.sqrt(
-        realDx * realDx +
-        realDy * realDy
-    );
+                let realDist = Math.sqrt(
+                    realDx * realDx +
+                    realDy * realDy
+                );
 
-    if (realDist < rankData.meleeRange) {
+                if (realDist < rankData.meleeRange) {
 
-        player.hp = 0;
+                    player.hp = 0;
 
-        player.lastHitTime = Date.now();
+                    player.lastHitTime = Date.now();
 
-        return;
-    }
-}
+                    return;
+                }
+            }
 
             // streľba
             e.cooldown -= delta;
 
-if (
-    !rankData.melee &&
-    e.cooldown <= 0 &&
-    dist < 500
-) {
+            if (
+                !rankData.melee &&
+                e.cooldown <= 0 &&
+                dist < 500
+            ) {
 
                 let angle = Math.atan2(
                     player.y - e.y,
@@ -1089,24 +1089,24 @@ if (
                 angle +=
                     (Math.random() - 0.5)
                     * rankData.accuracy;
-// ENEMY SHOOT SOUND
-if (e.type === "elite") {
+                // ENEMY SHOOT SOUND
+                if (e.type === "elite") {
 
-    let s = plasmaShotSound.cloneNode();
+                    let s = plasmaShotSound.cloneNode();
 
-    s.volume = 0.25;
+                    s.volume = 0.25;
 
-    s.play();
-}
+                    s.play();
+                }
 
-if (e.type === "grunt") {
+                if (e.type === "grunt") {
 
-    let s = needlerShotSound.cloneNode();
+                    let s = needlerShotSound.cloneNode();
 
-    s.volume = 0.25;
+                    s.volume = 0.25;
 
-    s.play();
-}
+                    s.play();
+                }
                 bullets.push({
 
                     x: e.x,
